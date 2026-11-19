@@ -253,6 +253,42 @@ export {
   CustomSectionRenderer,
 };
 
+import {
+  printDocument,
+  generateExportFileName,
+  exportDocumentImage,
+} from '@/lib/cvExport';
+
+import {
+  createFullBackupPayload,
+  createSingleProfileBackupPayload,
+  downloadJsonFile,
+  copyJsonToClipboard,
+  readJsonFile,
+  parseImportJsonString,
+  type ImportPreviewResult,
+} from '@/lib/cvBackup';
+
+import {
+  formatDateStamp,
+  sanitizeFileName,
+} from '@/lib/cvFormatters';
+
+export {
+  printDocument,
+  generateExportFileName,
+  exportDocumentImage,
+  createFullBackupPayload,
+  createSingleProfileBackupPayload,
+  downloadJsonFile,
+  copyJsonToClipboard,
+  readJsonFile,
+  parseImportJsonString,
+  formatDateStamp,
+  sanitizeFileName,
+};
+export type { ImportPreviewResult };
+
 export default function CVBuilderClient({
   initialPortfolio,
   isPublicView = false,
@@ -1039,17 +1075,19 @@ export default function CVBuilderClient({
   const [isCompact, setIsCompact] = useState(false);
 
   // Fine-grain Typography & Margins Config State
-  const [typographyConfig, setTypographyConfig] = useState<CVTypographyConfig>(() => {
+  const [typographyConfig, setTypographyConfig] = useState<CVTypographyConfig>(DEFAULT_TYPOGRAPHY_CONFIG);
+
+  // Load saved typography from localStorage on mount (hydration safe)
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ducanh_cv_typography_config');
       if (saved) {
         try {
-          return { ...DEFAULT_TYPOGRAPHY_CONFIG, ...JSON.parse(saved) };
+          setTypographyConfig({ ...DEFAULT_TYPOGRAPHY_CONFIG, ...JSON.parse(saved) });
         } catch (e) {}
       }
     }
-    return DEFAULT_TYPOGRAPHY_CONFIG;
-  });
+  }, []);
 
   // Sync typography to localStorage
   useEffect(() => {
@@ -1456,15 +1494,12 @@ export default function CVBuilderClient({
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // 1. Export Full Bilingual Package (.json)
+  // 1. Export Full Multi-Language CV Package (.json)
   const handleExportFullJSON = () => {
-    const activeCvVi = lang === 'vi' ? cv : cvVi;
-    const activeCvEn = lang === 'en' ? cv : cvEn;
-    const exportPayload = {
-      $schema: 'https://nguyenducanh.dev/schemas/cv-backup-v1.json',
-      app: 'DucAnh Portfolio CV Studio',
-      version: 1,
-      exportedAt: new Date().toISOString(),
+    const payload = createFullBackupPayload({
+      cv,
+      cvVi,
+      cvEn,
       lang,
       template,
       accentColor,
@@ -1472,62 +1507,17 @@ export default function CVBuilderClient({
       isCompact,
       sectionOrder,
       sectionVisibility,
-      cvVi: activeCvVi,
-      cvEn: activeCvEn,
-    };
-
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    const dateStr = new Date().toISOString().slice(0, 10);
-    downloadAnchor.setAttribute('download', `cv-full-backup-${dateStr}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-
+    });
+    const dateStr = formatDateStamp();
+    downloadJsonFile(payload, `cv-full-backup-${dateStr}.json`);
     setToastMessage(lang === 'en' ? 'Exported full CV backup (.json) successfully!' : 'Đã xuất trọn gói dữ liệu CV (.json) thành công!');
     setTimeout(() => setToastMessage(null), 3000);
   };
 
   // 2. Export Active Language Profile Only (.json)
   const handleExportCurrentProfileJSON = () => {
-    const exportPayload = {
-      $schema: 'https://nguyenducanh.dev/schemas/cv-profile-v1.json',
-      app: 'DucAnh Portfolio CV Studio',
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      language: lang,
-      template,
-      accentColor,
-      fontFamily,
-      isCompact,
-      sectionOrder,
-      sectionVisibility,
-      data: cv,
-    };
-
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    const dateStr = new Date().toISOString().slice(0, 10);
-    const safeName = (cv.name || 'cv').toLowerCase().replace(/[^a-z0-9]/g, '-');
-    downloadAnchor.setAttribute('download', `cv-${lang}-${safeName}-${dateStr}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-
-    setToastMessage(lang === 'en' ? `Exported ${lang.toUpperCase()} CV profile (.json) successfully!` : `Đã xuất hồ sơ CV ${lang === 'vi' ? 'Tiếng Việt' : 'Tiếng Anh'} (.json) thành công!`);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  // 3. Copy JSON to Clipboard
-  const handleCopyJSON = () => {
-    const activeCvVi = lang === 'vi' ? cv : cvVi;
-    const activeCvEn = lang === 'en' ? cv : cvEn;
-    const exportPayload = {
-      app: 'DucAnh Portfolio CV Studio',
-      version: 1,
-      exportedAt: new Date().toISOString(),
+    const payload = createSingleProfileBackupPayload({
+      cv,
       lang,
       template,
       accentColor,
@@ -1535,101 +1525,51 @@ export default function CVBuilderClient({
       isCompact,
       sectionOrder,
       sectionVisibility,
-      cvVi: activeCvVi,
-      cvEn: activeCvEn,
-    };
-    navigator.clipboard.writeText(JSON.stringify(exportPayload, null, 2));
+    });
+    const dateStr = formatDateStamp();
+    const safeName = (cv.name || 'cv').toLowerCase().replace(/[^a-z0-9]/g, '-');
+    downloadJsonFile(payload, `cv-${lang}-${safeName}-${dateStr}.json`);
+    setToastMessage(lang === 'en' ? `Exported ${lang.toUpperCase()} CV profile (.json) successfully!` : `Đã xuất hồ sơ CV ${lang === 'vi' ? 'Tiếng Việt' : 'Tiếng Anh'} (.json) thành công!`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // 3. Copy JSON to Clipboard
+  const handleCopyJSON = async () => {
+    const payload = createFullBackupPayload({
+      cv,
+      cvVi,
+      cvEn,
+      lang,
+      template,
+      accentColor,
+      fontFamily,
+      isCompact,
+      sectionOrder,
+      sectionVisibility,
+    });
+    await copyJsonToClipboard(payload);
     setToastMessage(t.copyJsonBtn + ' — ' + (lang === 'en' ? 'Copied to clipboard!' : 'Đã sao chép vào bộ nhớ tạm!'));
     setTimeout(() => setToastMessage(null), 3000);
   };
 
   // 4. Process Uploaded JSON File
-  const processImportFile = (file: File) => {
-    if (!file.name.toLowerCase().endsWith('.json') && file.type !== 'application/json') {
-      setImportErrorMsg(lang === 'en' ? 'Please select a valid .json file.' : 'Vui lòng chọn tệp có định dạng .json');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const raw = e.target?.result as string;
-        const parsed = JSON.parse(raw);
-
-        // Case A: Full package containing cvVi and/or cvEn
-        if (parsed.cvVi || parsed.cvEn) {
-          const vi = parsed.cvVi || parsed.cv;
-          const en = parsed.cvEn;
-          const primary = vi || en || {};
-
-          setImportPreview({
-            type: 'full',
-            data: parsed,
-            summary: {
-              name: primary.name,
-              role: primary.role,
-              hasVi: !!parsed.cvVi,
-              hasEn: !!parsed.cvEn,
-              viName: parsed.cvVi?.name,
-              enName: parsed.cvEn?.name,
-              template: parsed.template,
-              timelineCount: (primary.timeline || []).length,
-              projectsCount: (primary.projects || []).length,
-              skillsCount: (primary.skills || []).length,
-              eduCount: (primary.education || []).length,
-            },
-          });
-          setImportErrorMsg(null);
-          return;
-        }
-
-        // Case B: Single profile (candidate.data, candidate.cv or root candidate)
-        const candidate = parsed.data || parsed.cv || parsed;
-        if (candidate && (candidate.name || candidate.timeline || candidate.skills || candidate.projects || candidate.role)) {
-          const normalized: CVData = {
-            name: candidate.name || 'Nguyen Duc Anh',
-            role: candidate.role || 'Developer',
-            email: candidate.email || '',
-            phone: candidate.phone || '',
-            location: candidate.location || '',
-            github: candidate.github || '',
-            linkedin: candidate.linkedin || '',
-            website: candidate.website || '',
-            avatar: candidate.avatar || '',
-            showAvatar: candidate.showAvatar ?? true,
-            summary: candidate.summary || '',
-            timeline: Array.isArray(candidate.timeline) ? candidate.timeline : [],
-            projects: Array.isArray(candidate.projects) ? candidate.projects : [],
-            skills: Array.isArray(candidate.skills) ? candidate.skills : [],
-            education: Array.isArray(candidate.education) ? candidate.education : [],
-          };
-
-          setImportPreview({
-            type: 'single',
-            data: normalized,
-            meta: parsed,
-            summary: {
-              name: normalized.name,
-              role: normalized.role,
-              timelineCount: normalized.timeline.length,
-              projectsCount: normalized.projects.length,
-              skillsCount: normalized.skills.length,
-              eduCount: normalized.education.length,
-            },
-          });
-          setImportErrorMsg(null);
-          return;
-        }
-
+  const processImportFile = async (file: File) => {
+    try {
+      const raw = await readJsonFile(file);
+      const preview = parseImportJsonString(raw);
+      setImportPreview(preview);
+      setImportErrorMsg(null);
+    } catch (err: any) {
+      if (err.message === 'FILE_TYPE_INVALID') {
+        setImportErrorMsg(lang === 'en' ? 'Please select a valid .json file.' : 'Vui lòng chọn tệp có định dạng .json');
+      } else if (err.message === 'FILE_READ_ERROR') {
+        setImportErrorMsg(lang === 'en' ? 'Failed to read file.' : 'Không thể đọc tệp đã chọn.');
+      } else if (err.message === 'INVALID_CV_SCHEMA') {
         setImportErrorMsg(t.importInvalidMsg);
-      } catch (err: any) {
+      } else {
         setImportErrorMsg(lang === 'en' ? `Failed to parse JSON file: ${err.message}` : `Lỗi đọc file JSON: ${err.message}`);
       }
-    };
-    reader.onerror = () => {
-      setImportErrorMsg(lang === 'en' ? 'Failed to read file.' : 'Không thể đọc tệp đã chọn.');
-    };
-    reader.readAsText(file);
+    }
   };
 
   const handleJSONFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -2445,7 +2385,7 @@ export default function CVBuilderClient({
 
   // Compute live shareable public URL with query options
   const sharePublicUrl = useMemo(() => {
-    const origin = shareOrigin || (typeof window !== 'undefined' ? window.location.origin : '');
+    const origin = shareOrigin;
     if (!origin) return '/cv/view';
     const params = new URLSearchParams();
     if (lang === 'en') params.set('lang', 'en');
@@ -2530,7 +2470,13 @@ export default function CVBuilderClient({
 
   // Print Action
   const handlePrint = () => {
-    window.print();
+    if (isLoading) {
+      setToastMessage(lang === 'en' ? 'CV is still loading, please wait a moment...' : 'Hồ sơ đang tải, vui lòng chờ trong giây lát...');
+      setTimeout(() => setToastMessage(null), 2500);
+      return;
+    }
+    setIsExportMenuOpen(false);
+    printDocument();
   };
 
   // High-Resolution Image Export Handler (PNG / JPG 300 DPI)
@@ -2543,18 +2489,22 @@ export default function CVBuilderClient({
     const baseName = isCoverLetter
       ? (currentLetter.senderName || cv.name || 'Nguyen_Duc_Anh')
       : (cv.name || 'Nguyen_Duc_Anh');
-    const sanitizedName = baseName.trim().replace(/[^a-zA-Z0-9_\u00C0-\u024F\u1EA0-\u1EF9]/g, '_');
-    const docTag = isCoverLetter ? 'CoverLetter' : 'CV';
-    const fileName = `${sanitizedName}_${docTag}_${template}_${lang.toUpperCase()}_${resolution}x`;
+    const fileName = generateExportFileName({
+      baseName,
+      docType: isCoverLetter ? 'CoverLetter' : 'CV',
+      template,
+      lang,
+      resolution,
+    });
 
     setToastMessage(
       lang === 'en'
-        ? `Rendering high-res ${format.toUpperCase()} (${resolution === 2 ? '300 DPI' : `${resolution}x`})...`
-        : `Đang xử lý xuất ảnh ${format.toUpperCase()} (${resolution === 2 ? 'chuẩn 300 DPI' : `${resolution}x`})...`
+        ? `Rendering high-res ${format.toUpperCase()} (${resolution === 2 ? '300 DPI' : resolution + 'x'})...`
+        : `Đang xử lý xuất ảnh ${format.toUpperCase()} (${resolution === 2 ? 'chuẩn 300 DPI' : resolution + 'x'})...`
     );
 
     try {
-      const result = await exportCVToImage({
+      const result = await exportDocumentImage({
         elementId: targetElementId,
         format,
         resolution,
@@ -6222,7 +6172,7 @@ export default function CVBuilderClient({
         {!isPreviewMode && isDrawerOpen && (
           <div
             onClick={() => setIsDrawerOpen(false)}
-            className="lg:hidden fixed inset-0 bg-black/60 z-10 backdrop-blur-xs"
+            className="no-print lg:hidden fixed inset-0 bg-black/60 z-10 backdrop-blur-xs"
           />
         )}
 
@@ -11858,6 +11808,22 @@ export default function CVBuilderClient({
         }
 
         @media print {
+          *, *::before, *::after {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+
+          html, body {
+            background: #ffffff !important;
+            color: #000000 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            overflow: visible !important;
+          }
+
           .h-screen {
             height: auto !important;
             overflow: visible !important;
@@ -11871,25 +11837,41 @@ export default function CVBuilderClient({
           nav,
           aside,
           .no-print,
-          #customCursorWrapper {
+          #customCursorWrapper,
+          .noise-overlay,
+          #preloader,
+          #projectModal {
             display: none !important;
           }
 
-          body {
-            background: #ffffff !important;
-            color: #000000 !important;
+          main {
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
             padding: 0 !important;
             margin: 0 !important;
+            background: transparent !important;
+            background-image: none !important;
+            display: block !important;
+          }
+
+          main > div {
+            transform: none !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+            width: 100% !important;
           }
 
           .cv-paper {
             box-shadow: none !important;
             border: none !important;
-            margin: 0 !important;
+            margin: 0 auto !important;
             padding: 0 !important;
-            width: 100% !important;
-            max-width: 100% !important;
+            width: 210mm !important;
+            max-width: 210mm !important;
+            min-height: 297mm !important;
             transform: none !important;
+            background-color: #ffffff !important;
           }
 
           .cv-compact {
@@ -11909,7 +11891,7 @@ export default function CVBuilderClient({
 
           @page {
             size: A4 portrait;
-            margin: ${isCompact ? '4mm 6mm' : '8mm 8mm'} !important;
+            margin: 0;
           }
         }
       `}</style>

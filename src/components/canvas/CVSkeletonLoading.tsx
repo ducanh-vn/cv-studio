@@ -8,7 +8,7 @@ export interface CVSkeletonLoadingProps {
 
 export function CVSkeletonLoading({ className = '' }: CVSkeletonLoadingProps) {
   return (
-    <div className={`w-[210mm] min-h-[297mm] bg-white rounded-sm shadow-2xl p-8 space-y-8 animate-pulse flex flex-col justify-between select-none ${className}`}>
+    <div className={`no-print w-[210mm] min-h-[297mm] bg-white rounded-sm shadow-2xl p-8 space-y-8 animate-pulse flex flex-col justify-between select-none ${className}`}>
       {/* Header Skeleton */}
       <div className="space-y-4 pb-6 border-b border-neutral-200">
         <div className="flex justify-between items-start">
