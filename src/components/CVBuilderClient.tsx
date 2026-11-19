@@ -31,6 +31,7 @@ import {
   ZoomOut,
   Type,
   Palette,
+  Grid,
   Bold,
   Italic,
   Underline,
@@ -187,6 +188,116 @@ export interface CustomSectionItem {
   date?: string;
   desc?: string;
 }
+
+export type CanvasBgThemeId =
+  | 'figma-dots'
+  | 'portfolio-warm'
+  | 'blueprint-grid'
+  | 'editorial-noise'
+  | 'pitch-black'
+  | 'studio-slate';
+
+export interface CanvasBgThemeOption {
+  id: CanvasBgThemeId;
+  nameVi: string;
+  nameEn: string;
+  tagVi: string;
+  tagEn: string;
+  style: React.CSSProperties;
+  previewBg: string;
+  previewPattern?: string;
+  previewBadge: string;
+}
+
+export const CANVAS_BG_THEMES: CanvasBgThemeOption[] = [
+  {
+    id: 'figma-dots',
+    nameVi: 'Figma Dot Grid',
+    nameEn: 'Figma Dot Grid',
+    tagVi: 'Lưới chấm bi xám xanh chuẩn Figma/Miro',
+    tagEn: 'Subtle slate dot grid like Figma & Miro',
+    style: {
+      backgroundColor: '#0B0F17',
+      backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.08) 1.2px, transparent 1.2px)',
+      backgroundSize: '20px 20px',
+    },
+    previewBg: '#0B0F17',
+    previewPattern: 'radial-gradient(rgba(255, 255, 255, 0.28) 1.2px, transparent 1.2px)',
+    previewBadge: 'Mặc định',
+  },
+  {
+    id: 'portfolio-warm',
+    nameVi: 'Portfolio Luxury',
+    nameEn: 'Portfolio Luxury',
+    tagVi: 'Nền đen ấm #141414 & chấm vàng gold mờ',
+    tagEn: 'Warm black #141414 with soft gold dots',
+    style: {
+      backgroundColor: '#141414',
+      backgroundImage: 'radial-gradient(rgba(241, 245, 5, 0.12) 1.2px, transparent 1.2px)',
+      backgroundSize: '22px 22px',
+    },
+    previewBg: '#141414',
+    previewPattern: 'radial-gradient(rgba(241, 245, 5, 0.35) 1.2px, transparent 1.2px)',
+    previewBadge: 'Portfolio',
+  },
+  {
+    id: 'blueprint-grid',
+    nameVi: 'Tech Blueprint',
+    nameEn: 'Tech Blueprint',
+    tagVi: 'Lưới ô vuông kỹ thuật số Cyan',
+    tagEn: 'Modern tech engineering graph grid',
+    style: {
+      backgroundColor: '#0A0F1D',
+      backgroundImage: 'linear-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.08) 1px, transparent 1px)',
+      backgroundSize: '24px 24px',
+    },
+    previewBg: '#0A0F1D',
+    previewPattern: 'linear-gradient(rgba(56, 189, 248, 0.25) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.25) 1px, transparent 1px)',
+    previewBadge: 'Kỹ thuật',
+  },
+  {
+    id: 'editorial-noise',
+    nameVi: 'Film Grain Dark',
+    nameEn: 'Film Grain Dark',
+    tagVi: 'Nhiễu hạt máy ảnh điện ảnh cổ điển',
+    tagEn: 'Cinematic subtle film noise overlay',
+    style: {
+      backgroundColor: '#141414',
+      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E")`,
+    },
+    previewBg: '#141414',
+    previewPattern: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.18'/%3E%3C/svg%3E")`,
+    previewBadge: 'Grain',
+  },
+  {
+    id: 'pitch-black',
+    nameVi: 'Pitch Black OLED',
+    nameEn: 'Pitch Black OLED',
+    tagVi: 'Đen tuyền tối giản, tập trung 100%',
+    tagEn: 'Pure solid deep dark for zero distraction',
+    style: {
+      backgroundColor: '#07090E',
+      backgroundImage: 'none',
+    },
+    previewBg: '#07090E',
+    previewBadge: 'Tối giản',
+  },
+  {
+    id: 'studio-slate',
+    nameVi: 'Studio Slate',
+    nameEn: 'Studio Slate',
+    tagVi: 'Xám than dịu mắt, chống lóa ban đêm',
+    tagEn: 'Soft slate zinc for long editing sessions',
+    style: {
+      backgroundColor: '#181E29',
+      backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px)',
+      backgroundSize: '18px 18px',
+    },
+    previewBg: '#181E29',
+    previewPattern: 'radial-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px)',
+    previewBadge: 'Dịu mắt',
+  },
+];
 
 export interface CustomSection {
   id: string;
@@ -2788,6 +2899,47 @@ export default function CVBuilderClient({
   const [accentColor, setAccentColor] = useState<'blue' | 'yellow' | 'emerald' | 'slate' | 'rose'>('blue');
   const [fontFamily, setFontFamily] = useState<CVFontFamily>('inter');
   const [zoom, setZoom] = useState<number>(90);
+
+  // Canvas Workspace Background Theme State (Figma Dot Grid, Portfolio Luxury, etc.)
+  const [canvasBgTheme, setCanvasBgTheme] = useState<CanvasBgThemeId>('figma-dots');
+  const [isBgPickerOpen, setIsBgPickerOpen] = useState(false);
+  const bgPickerRef = useRef<HTMLDivElement>(null);
+
+  // Load saved canvas background preference
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('cv_canvas_bg_theme') as CanvasBgThemeId | null;
+      if (saved && CANVAS_BG_THEMES.some((t) => t.id === saved)) {
+        setCanvasBgTheme(saved);
+      }
+    }
+  }, []);
+
+  // Close bg picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (bgPickerRef.current && !bgPickerRef.current.contains(e.target as Node)) {
+        setIsBgPickerOpen(false);
+      }
+    };
+    if (isBgPickerOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isBgPickerOpen]);
+
+  const handleSelectCanvasBgTheme = (themeId: CanvasBgThemeId) => {
+    setCanvasBgTheme(themeId);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cv_canvas_bg_theme', themeId);
+    }
+  };
+
+  const currentCanvasBg = useMemo(() => {
+    return CANVAS_BG_THEMES.find((t) => t.id === canvasBgTheme) || CANVAS_BG_THEMES[0];
+  }, [canvasBgTheme]);
   const [newSkillText, setNewSkillText] = useState('');
   const [isAddingSkill, setIsAddingSkill] = useState(false);
 
@@ -5721,6 +5873,72 @@ export default function CVBuilderClient({
                     </div>
                   </div>
 
+                  {/* ================= WORKSPACE CANVAS BACKGROUND SETTINGS ================= */}
+                  <div className="space-y-2.5 pt-3 border-t border-white/10">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Grid className="w-3.5 h-3.5 text-cyan-400" />
+                        <span className="uppercase text-[10px] tracking-wider font-semibold text-neutral-300">
+                          {lang === 'en' ? 'CANVAS WORKSPACE THEME' : 'HỌA TIẾT NỀN BÀN LÀM VIỆC'}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-cyan-400 font-medium">
+                        {CANVAS_BG_THEMES.find((t) => t.id === canvasBgTheme)?.nameVi}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-neutral-400 leading-relaxed">
+                      {lang === 'en'
+                        ? 'Customize the workspace background surrounding your CV to match your style or DucAnh Portfolio.'
+                        : 'Tùy chỉnh không gian bàn làm việc bao quanh tờ CV theo sở thích hoặc phong cách Portfolio.'}
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      {CANVAS_BG_THEMES.map((theme) => {
+                        const isSelected = canvasBgTheme === theme.id;
+                        return (
+                          <button
+                            key={theme.id}
+                            type="button"
+                            onClick={() => handleSelectCanvasBgTheme(theme.id)}
+                            className={`p-2.5 rounded-xl border text-left transition-all relative flex flex-col justify-between group cursor-pointer ${
+                              isSelected
+                                ? 'bg-[#161F30] border-cyan-500 shadow-md shadow-cyan-500/10 ring-1 ring-cyan-500/50'
+                                : 'bg-[#111827] border-white/10 hover:border-white/20 hover:bg-[#141C2E]'
+                            }`}
+                          >
+                            {/* Swatch Preview Box */}
+                            <div
+                              className="w-full h-11 rounded-lg border border-white/10 mb-2 relative overflow-hidden flex items-center justify-center transition-transform group-hover:scale-[1.02]"
+                              style={{
+                                backgroundColor: theme.previewBg,
+                                backgroundImage: theme.previewPattern || 'none',
+                                backgroundSize: theme.style.backgroundSize || 'auto',
+                              }}
+                            >
+                              {isSelected && (
+                                <div className="w-5 h-5 rounded-full bg-cyan-500 text-black flex items-center justify-center shadow-lg">
+                                  <Check className="w-3 h-3 stroke-[3]" />
+                                </div>
+                              )}
+                              <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-black/70 text-neutral-300 backdrop-blur-xs">
+                                {theme.previewBadge}
+                              </span>
+                            </div>
+
+                            <div>
+                              <div className={`text-xs font-semibold truncate ${isSelected ? 'text-cyan-300' : 'text-neutral-200'}`}>
+                                {lang === 'en' ? theme.nameEn : theme.nameVi}
+                              </div>
+                              <div className="text-[10px] text-neutral-400 mt-0.5 line-clamp-1">
+                                {lang === 'en' ? theme.tagEn : theme.tagVi}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   {/* Fine-grain Typography Sliders */}
                   <div className="pt-3 border-t border-white/10">
                     <CVTypographySliders
@@ -6869,6 +7087,72 @@ export default function CVBuilderClient({
                           ? 'Automatically optimizes line heights, margins, and font sizes to ensure all content fits neatly onto a single A4 page (297mm) without spilling over.'
                           : 'Tự động co giãn khoảng cách dòng, đệm lề và font chữ để nội dung vừa khít trong đúng 1 mặt giấy A4 tiêu chuẩn (297mm), tránh tràn trang khi xuất PDF.'}
                       </p>
+                    </div>
+                  </div>
+
+                  {/* ================= WORKSPACE CANVAS BACKGROUND SETTINGS ================= */}
+                  <div className="space-y-2.5 pt-3 border-t border-white/10">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Grid className="w-3.5 h-3.5 text-cyan-400" />
+                        <span className="uppercase text-[10px] tracking-wider font-semibold text-neutral-300">
+                          {lang === 'en' ? 'CANVAS WORKSPACE THEME' : 'HỌA TIẾT NỀN BÀN LÀM VIỆC'}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-cyan-400 font-medium">
+                        {CANVAS_BG_THEMES.find((t) => t.id === canvasBgTheme)?.nameVi}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-neutral-400 leading-relaxed">
+                      {lang === 'en'
+                        ? 'Customize the workspace background surrounding your CV to match your style or DucAnh Portfolio.'
+                        : 'Tùy chỉnh không gian bàn làm việc bao quanh tờ CV theo sở thích hoặc phong cách Portfolio.'}
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      {CANVAS_BG_THEMES.map((theme) => {
+                        const isSelected = canvasBgTheme === theme.id;
+                        return (
+                          <button
+                            key={theme.id}
+                            type="button"
+                            onClick={() => handleSelectCanvasBgTheme(theme.id)}
+                            className={`p-2.5 rounded-xl border text-left transition-all relative flex flex-col justify-between group cursor-pointer ${
+                              isSelected
+                                ? 'bg-[#161F30] border-cyan-500 shadow-md shadow-cyan-500/10 ring-1 ring-cyan-500/50'
+                                : 'bg-[#111827] border-white/10 hover:border-white/20 hover:bg-[#141C2E]'
+                            }`}
+                          >
+                            {/* Swatch Preview Box */}
+                            <div
+                              className="w-full h-11 rounded-lg border border-white/10 mb-2 relative overflow-hidden flex items-center justify-center transition-transform group-hover:scale-[1.02]"
+                              style={{
+                                backgroundColor: theme.previewBg,
+                                backgroundImage: theme.previewPattern || 'none',
+                                backgroundSize: theme.style.backgroundSize || 'auto',
+                              }}
+                            >
+                              {isSelected && (
+                                <div className="w-5 h-5 rounded-full bg-cyan-500 text-black flex items-center justify-center shadow-lg">
+                                  <Check className="w-3 h-3 stroke-[3]" />
+                                </div>
+                              )}
+                              <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-black/70 text-neutral-300 backdrop-blur-xs">
+                                {theme.previewBadge}
+                              </span>
+                            </div>
+
+                            <div>
+                              <div className={`text-xs font-semibold truncate ${isSelected ? 'text-cyan-300' : 'text-neutral-200'}`}>
+                                {lang === 'en' ? theme.nameEn : theme.nameVi}
+                              </div>
+                              <div className="text-[10px] text-neutral-400 mt-0.5 line-clamp-1">
+                                {lang === 'en' ? theme.tagEn : theme.tagVi}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -9983,14 +10267,10 @@ export default function CVBuilderClient({
         </div>
       )}
 
-      {/* ================= MAIN CV WORKSPACE CANVAS (FIGMA/MIRO DARK DOT GRID) ================= */}
+      {/* ================= MAIN CV WORKSPACE CANVAS ================= */}
       <main
         className="flex-1 h-full overflow-y-auto relative flex flex-col items-center py-8 sm:py-12 px-4 sm:px-10 pb-32 no-scrollbar transition-all"
-        style={{
-          backgroundColor: '#0B0F17',
-          backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.08) 1.2px, transparent 1.2px)',
-          backgroundSize: '20px 20px',
-        }}
+        style={currentCanvasBg.style}
       >
         {/* Minimal Floating Status Pill */}
         <div className="no-print mb-4 px-4 py-1.5 rounded-full bg-[#161B26]/90 border border-white/10 backdrop-blur-md shadow-lg text-[11px] text-neutral-400 flex items-center space-x-2 select-none flex-wrap justify-center flex-shrink-0">
@@ -12318,9 +12598,9 @@ export default function CVBuilderClient({
         </div>
       </main>
 
-        {/* Floating Zoom Control Pill - Fixed at Bottom Right of Editor Canvas */}
+        {/* Floating Zoom & Canvas Background Control Pill - Fixed at Bottom Right of Editor Canvas */}
         {!isPreviewMode && !isPublicView && (
-          <div className="no-print absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 flex items-center bg-[#161B26]/90 border border-white/10 rounded-full p-1 text-xs shadow-2xl backdrop-blur-md select-none transition-all hover:bg-[#161B26] hover:border-white/20">
+          <div className="no-print absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 flex items-center bg-[#161B26]/95 border border-white/10 rounded-full p-1 text-xs shadow-2xl backdrop-blur-md select-none transition-all hover:bg-[#161B26] hover:border-white/20">
             <button
               type="button"
               onClick={() => setZoom(Math.max(50, zoom - 10))}
@@ -12345,6 +12625,93 @@ export default function CVBuilderClient({
             >
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
+
+            {/* Vertical Divider */}
+            <div className="w-px h-3.5 bg-white/15 mx-1" />
+
+            {/* Quick Canvas Background Toggle */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsBgPickerOpen(!isBgPickerOpen)}
+                className={`flex items-center space-x-1 px-2 py-1 rounded-full text-[11px] font-medium transition-all cursor-pointer ${
+                  isBgPickerOpen
+                    ? 'bg-cyan-500 text-black shadow-md shadow-cyan-500/30'
+                    : 'text-neutral-300 hover:text-white hover:bg-white/10'
+                }`}
+                title={lang === 'en' ? 'Change Workspace Canvas Background' : 'Tùy chọn nền bàn làm việc'}
+              >
+                <Grid className="w-3.5 h-3.5 text-cyan-400 group-hover:text-cyan-300" />
+                <span className="hidden sm:inline text-[10px]">{currentCanvasBg.previewBadge}</span>
+              </button>
+
+              {/* Floating Quick Background Popover */}
+              {isBgPickerOpen && (
+                <div
+                  ref={bgPickerRef}
+                  className="absolute bottom-full right-0 mb-3 w-72 bg-[#121722]/98 border border-white/15 rounded-2xl p-3 shadow-2xl backdrop-blur-xl z-50 text-xs animate-in fade-in zoom-in-95 space-y-2.5"
+                >
+                  <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                    <div className="flex items-center space-x-1.5">
+                      <Grid className="w-3.5 h-3.5 text-cyan-400" />
+                      <span className="font-semibold text-white text-[11px] uppercase tracking-wider">
+                        {lang === 'en' ? 'Canvas Background' : 'Họa tiết nền Workspace'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsBgPickerOpen(false)}
+                      className="text-neutral-400 hover:text-white p-0.5 rounded cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1.5 max-h-60 overflow-y-auto no-scrollbar">
+                    {CANVAS_BG_THEMES.map((theme) => {
+                      const isSelected = canvasBgTheme === theme.id;
+                      return (
+                        <button
+                          key={theme.id}
+                          type="button"
+                          onClick={() => {
+                            handleSelectCanvasBgTheme(theme.id);
+                          }}
+                          className={`p-2 rounded-xl border text-left transition-all relative flex flex-col justify-between group cursor-pointer ${
+                            isSelected
+                              ? 'bg-[#182338] border-cyan-500 ring-1 ring-cyan-500/50 shadow-sm'
+                              : 'bg-[#111827] border-white/10 hover:border-white/20 hover:bg-[#161F30]'
+                          }`}
+                        >
+                          <div
+                            className="w-full h-8 rounded-lg border border-white/10 mb-1.5 relative overflow-hidden flex items-center justify-center transition-transform group-hover:scale-[1.02]"
+                            style={{
+                              backgroundColor: theme.previewBg,
+                              backgroundImage: theme.previewPattern || 'none',
+                              backgroundSize: theme.style.backgroundSize || 'auto',
+                            }}
+                          >
+                            {isSelected && (
+                              <div className="w-4 h-4 rounded-full bg-cyan-500 text-black flex items-center justify-center shadow">
+                                <Check className="w-2.5 h-2.5 stroke-[3]" />
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <div className={`text-[11px] font-semibold truncate ${isSelected ? 'text-cyan-300' : 'text-neutral-200'}`}>
+                              {lang === 'en' ? theme.nameEn : theme.nameVi}
+                            </div>
+                            <div className="text-[9px] text-neutral-400 truncate mt-0.5">
+                              {theme.previewBadge}
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
