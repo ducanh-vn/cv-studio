@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import CustomCursor from '@/components/CustomCursor';
 
 export const metadata: Metadata = {
   title: 'CV Studio — Professional CV & Resume Builder SaaS',
@@ -22,6 +23,8 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-[#090D16] text-[#f5f5f5] antialiased selection:bg-cyan-500 selection:text-white">
+        {/* Custom Modern Ring & Dot Cursor */}
+        <CustomCursor />
         {children}
       </body>
     </html>
