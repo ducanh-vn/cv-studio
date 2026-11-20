@@ -242,6 +242,8 @@ import {
   ItemControls,
   AvatarBlock,
   CustomSectionRenderer,
+  CVCanvasWorkspace,
+  CanvasFloatingControls,
 } from '@/components/canvas';
 
 export {
@@ -251,6 +253,8 @@ export {
   ItemControls,
   AvatarBlock,
   CustomSectionRenderer,
+  CVCanvasWorkspace,
+  CanvasFloatingControls,
 };
 
 import {
@@ -3542,276 +3546,47 @@ export default function CVBuilderClient({
         addedSkillKeyword={addedSkillKeyword}
       />
 
-      {/* ================= MAIN CV WORKSPACE CANVAS ================= */}
-      <main
-        className="flex-1 h-full overflow-y-auto relative flex flex-col items-center py-8 sm:py-12 px-4 sm:px-10 pb-32 no-scrollbar transition-all"
-        style={currentCanvasBg.style}
-      >
-        {/* Minimal Floating Status Pill */}
-        <div className="no-print mb-4 px-4 py-1.5 rounded-full bg-[#161B26]/90 border border-white/10 backdrop-blur-md shadow-lg text-[11px] text-neutral-400 flex items-center space-x-2 select-none flex-wrap justify-center flex-shrink-0">
-          {isPublicView ? (
-            <>
-              <span className="flex items-center space-x-1.5 text-emerald-400 font-semibold">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>{t.publicVerifiedBadge}</span>
-              </span>
-              <span className="text-neutral-600">•</span>
-              <span className="flex items-center space-x-1">
-                <span className="text-neutral-500">{lang === 'en' ? 'Template:' : 'Mẫu:'}</span>
-                <strong className="text-white font-medium capitalize">{activeTemplateDef.name}</strong>
-              </span>
-              <span className="text-neutral-600">•</span>
-              <span className="text-neutral-300">
-                {lang === 'vi' ? '🇻🇳 Tiếng Việt' : '🇬🇧 English'}
-              </span>
-              <span className="text-neutral-600">•</span>
-              <span className="text-cyan-400 font-mono font-medium">A4 210 × 297 mm</span>
-              <span className="text-neutral-600">•</span>
-              <span className="text-neutral-400">
-                {lang === 'en' ? 'Verified Recruiter View' : 'Chế độ xem trực tuyến cho Nhà tuyển dụng'}
-              </span>
-            </>
-          ) : docMode === 'cover_letter' ? (
-            <>
-              <span className="flex items-center space-x-1">
-                <span className="text-purple-400 font-semibold flex items-center space-x-1">
-                  <Mail className="w-3.5 h-3.5" />
-                  <span>{lang === 'en' ? 'Matching Cover Letter' : 'Thư xin việc đồng bộ'}</span>
-                </span>
-              </span>
-              <span className="text-neutral-600">•</span>
-              <span className="flex items-center space-x-1">
-                <span className="text-neutral-500">{lang === 'en' ? 'Template:' : 'Mẫu đồng bộ:'}</span>
-                <strong className="text-white font-medium capitalize">{activeTemplateDef.name}</strong>
-              </span>
-              <span className="text-neutral-600">•</span>
-              <span className="flex items-center space-x-1">
-                <span>{lang === 'vi' ? '🇻🇳 Tiếng Việt' : '🇬🇧 English'}</span>
-              </span>
-              <span className="text-neutral-600">•</span>
-              <span className="text-cyan-400 font-mono font-medium">A4 210 × 297 mm</span>
-              <span className="text-neutral-600 hidden sm:inline">•</span>
-              <span className="text-neutral-400 hidden sm:inline">
-                {lang === 'en' ? 'Click any text on letter to edit directly' : 'Nhấp trực tiếp vào chữ trên thư để chỉnh sửa'}
-              </span>
-            </>
-          ) : (
-            <>
-              <span className="flex items-center space-x-1">
-                <span className="text-neutral-500">{lang === 'en' ? 'Template:' : 'Mẫu:'}</span>
-                <strong className="text-white font-medium">{activeTemplateDef.name}</strong>
-              </span>
-              <span className="text-neutral-600">•</span>
-              <span className="flex items-center space-x-1">
-                <span>{lang === 'vi' ? '🇻🇳 Tiếng Việt' : '🇬🇧 English'}</span>
-              </span>
-              <span className="text-neutral-600">•</span>
-              <span className={isCompact ? 'text-amber-400 font-medium' : 'text-neutral-400'}>
-                {isCompact ? (lang === 'en' ? '1-Page Fit' : 'Chuẩn 1 trang A4') : (lang === 'en' ? 'Standard' : 'Tiêu chuẩn')}
-              </span>
-              <span className="text-neutral-600">•</span>
-              <span
-                className="flex items-center space-x-1 font-mono font-semibold"
-                style={{
-                  color: cvStrength.score >= 90 ? '#34d399' : cvStrength.score >= 75 ? '#22d3ee' : cvStrength.score >= 50 ? '#fbbf24' : '#fb7185',
-                }}
-              >
-                <Gauge className="w-3 h-3" />
-                <span>{cvStrength.score}% ATS</span>
-              </span>
-              <span className="text-neutral-600 hidden sm:inline">•</span>
-              <span className="text-neutral-400 hidden sm:inline">
-                {lang === 'en' ? 'Click any text on CV to edit directly' : 'Nhấp trực tiếp vào chữ để sửa'}
-              </span>
-            </>
-          )}
-        </div>
-        <div
-          style={{
-            transform: `scale(${zoom / 100})`,
-            transformOrigin: 'top center',
-          }}
-          className="transition-transform duration-200"
-        >
-          {/* ================= THE A4 SHEET ================= */}
-          <CVReadOnlyContext.Provider value={isPublicView}>
-            {docMode === 'cover_letter' ? (
-              <CoverLetterCanvas
-                coverLetter={currentCoverLetter}
-                template={template}
-                accentColor={accentColor}
-                fontFamily={fontFamily}
-                lang={lang}
-                onUpdateField={handleUpdateCoverLetterField}
-                isEditable={!isPublicView}
-              />
-            ) : isLoading ? (
-            <CVSkeletonLoading />
-          ) : (
-            <div
-              id="cv-paper"
-              className={`cv-paper bg-white text-neutral-900 shadow-2xl relative w-[210mm] min-h-[297mm] rounded-sm ${fontClass} ${
-                isCompact ? 'cv-compact leading-snug' : 'leading-relaxed'
-              } ${isPublicView ? 'cv-public-view' : ''} overflow-hidden animate-in fade-in duration-300`}
-              style={{
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
-                ['--cv-body-size' as any]: `${typographyConfig.bodyFontSize}px`,
-                ['--cv-heading-size' as any]: `${typographyConfig.headingFontSize}px`,
-                ['--cv-line-height' as any]: `${typographyConfig.lineHeight}`,
-                ['--cv-section-gap' as any]: `${typographyConfig.sectionSpacing}px`,
-                ['--cv-item-gap' as any]: `${typographyConfig.itemSpacing}px`,
-                ['--cv-pad-top-bottom' as any]: `${typographyConfig.pagePaddingTopBottom}px`,
-                ['--cv-pad-left-right' as any]: `${typographyConfig.pagePaddingLeftRight}px`,
-              }}
-            >
-              {/* 1-Page A4 Cutoff Indicator Line (Only visible on screen, never printed) */}
-              <div
-                className="no-print absolute left-0 right-0 border-b-2 border-dashed border-amber-500/80 z-30 pointer-events-none flex items-center justify-end pr-3 select-none"
-                style={{ top: '297mm' }}
-              >
-                <span className="bg-amber-500 text-black text-[9px] font-bold px-2 py-0.5 rounded-t font-mono shadow-sm tracking-wide">
-                  ✂ Giới hạn trang 1 (297mm) — Nội dung bên dưới sẽ tràn sang trang 2
-                </span>
-              </div>
+      {/* ================= MAIN CV WORKSPACE CANVAS (7.1) ================= */}
+      <CVCanvasWorkspace
+        currentCanvasBg={currentCanvasBg}
+        isPublicView={isPublicView}
+        docMode={docMode}
+        lang={lang}
+        t={t}
+        activeTemplateDef={activeTemplateDef}
+        isCompact={isCompact}
+        cvStrength={cvStrength}
+        zoom={zoom}
+        currentCoverLetter={currentCoverLetter}
+        template={template}
+        accentColor={accentColor}
+        fontFamily={fontFamily}
+        handleUpdateCoverLetterField={handleUpdateCoverLetterField}
+        isLoading={isLoading}
+        fontClass={fontClass}
+        typographyConfig={typographyConfig}
+        commonTemplateProps={commonTemplateProps}
+        activeQrConfig={activeQrConfig}
+        qrDataUrl={qrDataUrl}
+        activeColor={activeColor}
+        cv={cv}
+      />
 
-            {/* Dynamic Template Switcher (10 Architectural Templates) */}
-            <CVTemplateSwitch {...commonTemplateProps} templateId={template} />
-
-            {/* Dynamic Personal QR Code Footer Strip */}
-            {activeQrConfig.enabled && activeQrConfig.position === 'footer' && (
-              <div className="px-8 pb-4 pt-2">
-                <CVQRCodeFooter
-                  qrDataUrl={qrDataUrl}
-                  config={activeQrConfig}
-                  lang={lang}
-                  accentColorHex={activeColor.primary}
-                  candidateName={cv.name}
-                  websiteUrl={getQRTargetText(activeQrConfig, cv)}
-                />
-              </div>
-            )}
-          </div>
-        )}
-        </CVReadOnlyContext.Provider>
-        </div>
-      </main>
-
-        {/* Floating Zoom & Canvas Background Control Pill - Fixed at Bottom Right of Editor Canvas */}
-        {!isPreviewMode && !isPublicView && (
-          <div className="no-print absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 flex items-center bg-[#161B26]/95 border border-white/10 rounded-full p-1 text-xs shadow-2xl backdrop-blur-md select-none transition-all hover:bg-[#161B26] hover:border-white/20">
-            <button
-              type="button"
-              onClick={() => setZoom(Math.max(50, zoom - 10))}
-              className="p-1.5 text-neutral-400 hover:text-white rounded-full hover:bg-white/10 transition-colors cursor-pointer"
-              title={lang === 'en' ? 'Zoom Out (-10%)' : 'Thu nhỏ (-10%)'}
-            >
-              <ZoomOut className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setZoom(100)}
-              className="px-2.5 py-0.5 font-mono text-[11px] text-neutral-200 hover:text-white font-medium select-none cursor-pointer hover:bg-white/5 rounded-full transition-colors"
-              title={lang === 'en' ? 'Click to reset to 100%' : 'Nhấp để reset về 100%'}
-            >
-              {zoom}%
-            </button>
-            <button
-              type="button"
-              onClick={() => setZoom(Math.min(150, zoom + 10))}
-              className="p-1.5 text-neutral-400 hover:text-white rounded-full hover:bg-white/10 transition-colors cursor-pointer"
-              title={lang === 'en' ? 'Zoom In (+10%)' : 'Phóng to (+10%)'}
-            >
-              <ZoomIn className="w-3.5 h-3.5" />
-            </button>
-
-            {/* Vertical Divider */}
-            <div className="w-px h-3.5 bg-white/15 mx-1" />
-
-            {/* Quick Canvas Background Toggle */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsBgPickerOpen(!isBgPickerOpen)}
-                className={`flex items-center space-x-1 px-2 py-1 rounded-full text-[11px] font-medium transition-all cursor-pointer ${
-                  isBgPickerOpen
-                    ? 'bg-cyan-500 text-black shadow-md shadow-cyan-500/30'
-                    : 'text-neutral-300 hover:text-white hover:bg-white/10'
-                }`}
-                title={lang === 'en' ? 'Change Workspace Canvas Background' : 'Tùy chọn nền bàn làm việc'}
-              >
-                <Grid className="w-3.5 h-3.5 text-cyan-400 group-hover:text-cyan-300" />
-                <span className="hidden sm:inline text-[10px]">{currentCanvasBg.previewBadge}</span>
-              </button>
-
-              {/* Floating Quick Background Popover */}
-              {isBgPickerOpen && (
-                <div
-                  ref={bgPickerRef}
-                  className="absolute bottom-full right-0 mb-3 w-72 bg-[#121722]/98 border border-white/15 rounded-2xl p-3 shadow-2xl backdrop-blur-xl z-50 text-xs animate-in fade-in zoom-in-95 space-y-2.5"
-                >
-                  <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                    <div className="flex items-center space-x-1.5">
-                      <Grid className="w-3.5 h-3.5 text-cyan-400" />
-                      <span className="font-semibold text-white text-[11px] uppercase tracking-wider">
-                        {lang === 'en' ? 'Canvas Background' : 'Họa tiết nền Workspace'}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setIsBgPickerOpen(false)}
-                      className="text-neutral-400 hover:text-white p-0.5 rounded cursor-pointer"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-1.5 max-h-60 overflow-y-auto no-scrollbar">
-                    {CANVAS_BG_THEMES.map((theme) => {
-                      const isSelected = canvasBgTheme === theme.id;
-                      return (
-                        <button
-                          key={theme.id}
-                          type="button"
-                          onClick={() => {
-                            handleSelectCanvasBgTheme(theme.id);
-                          }}
-                          className={`p-2 rounded-xl border text-left transition-all relative flex flex-col justify-between group cursor-pointer ${
-                            isSelected
-                              ? 'bg-[#182338] border-cyan-500 ring-1 ring-cyan-500/50 shadow-sm'
-                              : 'bg-[#111827] border-white/10 hover:border-white/20 hover:bg-[#161F30]'
-                          }`}
-                        >
-                          <div
-                            className="w-full h-8 rounded-lg border border-white/10 mb-1.5 relative overflow-hidden flex items-center justify-center transition-transform group-hover:scale-[1.02]"
-                            style={{
-                              backgroundColor: theme.previewBg,
-                              backgroundImage: theme.previewPattern || 'none',
-                              backgroundSize: theme.style.backgroundSize || 'auto',
-                            }}
-                          >
-                            {isSelected && (
-                              <div className="w-4 h-4 rounded-full bg-cyan-500 text-black flex items-center justify-center shadow">
-                                <Check className="w-2.5 h-2.5 stroke-[3]" />
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <div className={`text-[11px] font-semibold truncate ${isSelected ? 'text-cyan-300' : 'text-neutral-200'}`}>
-                              {lang === 'en' ? theme.nameEn : theme.nameVi}
-                            </div>
-                            <div className="text-[9px] text-neutral-400 truncate mt-0.5">
-                              {theme.previewBadge}
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+      {/* ================= FLOATING CANVAS & FULLSCREEN CONTROLS (7.2) ================= */}
+      <CanvasFloatingControls
+        zoom={zoom}
+        setZoom={setZoom}
+        lang={lang}
+        canvasBgTheme={canvasBgTheme}
+        handleSelectCanvasBgTheme={handleSelectCanvasBgTheme}
+        currentCanvasBg={currentCanvasBg}
+        isPreviewMode={isPreviewMode}
+        setIsPreviewMode={setIsPreviewMode}
+        isPublicView={isPublicView}
+        handlePrint={handlePrint}
+        handleExportImage={handleExportImage}
+        isExportingImage={isExportingImage}
+      />
       </div>
 
       {/* ================= MODAL: TECH NOMENCLATURE LINTER STUDIO ================= */}
@@ -3874,55 +3649,6 @@ export default function CVBuilderClient({
         shareQrDataUrl={shareQrDataUrl}
         handleDownloadShareQr={handleDownloadShareQr}
       />
-
-      {/* ================= FULLSCREEN PREVIEW EXIT PILL ================= */}
-      {isPreviewMode && (
-        <div className="no-print fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#161B26]/95 border border-white/20 backdrop-blur-xl px-4 py-2 rounded-full shadow-2xl flex items-center space-x-3 text-xs text-neutral-200 select-none animate-in fade-in slide-in-from-bottom duration-200">
-          <button
-            onClick={() => setIsPreviewMode(false)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition-colors cursor-pointer"
-          >
-            <EyeOff className="w-3.5 h-3.5 text-cyan-400" />
-            <span>{lang === 'en' ? 'Exit Preview (ESC)' : 'Thoát xem trước (ESC)'}</span>
-          </button>
-          <div className="h-4 w-px bg-white/10" />
-          <div className="flex items-center space-x-1">
-            <button
-              onClick={() => setZoom(Math.max(50, zoom - 10))}
-              className="p-1 hover:text-white rounded"
-              title="Thu nhỏ"
-            >
-              <ZoomOut className="w-3.5 h-3.5" />
-            </button>
-            <span className="font-mono text-[11px] px-1 text-white">{zoom}%</span>
-            <button
-              onClick={() => setZoom(Math.min(150, zoom + 10))}
-              className="p-1 hover:text-white rounded"
-              title="Phóng to"
-            >
-              <ZoomIn className="w-3.5 h-3.5" />
-            </button>
-          </div>
-          <div className="h-4 w-px bg-white/10" />
-          <button
-            onClick={handlePrint}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition-colors cursor-pointer"
-            title="Xuất PDF in ấn"
-          >
-            <FileText className="w-3.5 h-3.5 text-rose-400" />
-            <span>PDF</span>
-          </button>
-          <button
-            onClick={() => handleExportImage('png', 2)}
-            disabled={isExportingImage}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-colors shadow-md shadow-indigo-500/20 active:scale-95 cursor-pointer disabled:opacity-50"
-            title="Xuất ảnh PNG sắc nét (300 DPI)"
-          >
-            {isExportingImage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImageIcon className="w-3.5 h-3.5" />}
-            <span>{isExportingImage ? (lang === 'en' ? 'Exporting...' : 'Đang xuất...') : (lang === 'en' ? 'PNG (HD)' : 'Ảnh PNG (HD)')}</span>
-          </button>
-        </div>
-      )}
 
       {/* ================= PRINT & COMPACT CSS STYLES (A4 ACCURATE) ================= */}
       <style jsx global>{`

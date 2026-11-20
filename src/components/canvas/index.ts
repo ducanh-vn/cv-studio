@@ -6,3 +6,5 @@ export * from './CVSkeletonLoading';
 export * from './ItemControls';
 export * from './AvatarBlock';
 export * from './CustomSectionRenderer';
+export * from './CVCanvasWorkspace';
+export * from './CanvasFloatingControls';
