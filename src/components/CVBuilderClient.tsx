@@ -39,7 +39,13 @@ import {
   createNewCVProfile,
   saveProfilesToStorage,
   loadProfilesFromStorage,
+  createInitialProfiles,
+  applyProfileToBuilder,
 } from '@/lib/cvProfiles';
+import {
+  DEFAULT_SECTION_ORDER,
+  DEFAULT_SECTION_VISIBILITY,
+} from '@/constants/cvConstants';
 import { readJsonFile, parseImportJsonString } from '@/lib/cvBackup';
 
 export type {
@@ -79,6 +85,7 @@ export default function CVBuilderClient({
 
   // 3. Multi-profile Management Hook
   const profiles = useCVProfiles({
+    userId: auth.user.id,
     cv: builder.cv,
     cvVi: builder.cvVi,
     cvEn: builder.cvEn,
@@ -137,25 +144,105 @@ export default function CVBuilderClient({
     setIsPreviewMode: builder.setIsPreviewMode,
   });
 
-  // Initial load for profiles from storage
+  // Track previous user ID to trigger profile reload on account switch
+  const prevUserIdRef = React.useRef<string | null>(null);
+
+  // Load and switch profiles when user changes or on initial mount
   useEffect(() => {
     if (builder.isLoading) return;
-    const { profiles: loadedProfiles, activeProfileId: initialActiveId } = loadProfilesFromStorage(
-      builder.cvVi,
-      builder.cvEn,
-      {
-        template: builder.template,
-        accentColor: builder.accentColor,
-        fontFamily: builder.fontFamily,
-        isCompact: builder.isCompact,
-        sectionOrder: builder.sectionOrder,
-        sectionVisibility: builder.sectionVisibility,
-        activeLang: builder.lang,
+    const currentUserId = auth.user.id || 'guest';
+
+    if (prevUserIdRef.current === currentUserId) return;
+    const isSwitchingFromAnotherUser = prevUserIdRef.current !== null;
+    prevUserIdRef.current = currentUserId;
+
+    async function loadUserProfiles() {
+      // 1. Authenticated user with Supabase
+      if (auth.isSupabaseReady && currentUserId !== 'guest') {
+        try {
+          const { initializeUserDataOnLogin } = await import('@/lib/supabaseSync');
+          const defaultStarterProfiles = createInitialProfiles(
+            builder.defaultCVData,
+            builder.defaultEnglishCVData,
+            {
+              template: 'rabbit',
+              accentColor: 'blue',
+              fontFamily: 'roboto',
+              isCompact: false,
+              sectionOrder: DEFAULT_SECTION_ORDER,
+              sectionVisibility: DEFAULT_SECTION_VISIBILITY,
+              activeLang: 'vi',
+            }
+          );
+
+          const { profiles: userProfiles, activeProfileId, isFirstTimeUser } =
+            await initializeUserDataOnLogin(
+              currentUserId,
+              defaultStarterProfiles,
+              [],
+              defaultStarterProfiles[0].id
+            );
+
+          profiles.setProfiles(userProfiles);
+          profiles.setActiveProfileId(activeProfileId);
+          saveProfilesToStorage(userProfiles, activeProfileId, currentUserId);
+
+          const targetProfile =
+            userProfiles.find((p) => p.id === activeProfileId) || userProfiles[0];
+          if (targetProfile) {
+            applyProfileToBuilder(targetProfile, builder);
+          }
+
+          if (isSwitchingFromAnotherUser) {
+            builder.setToastMessage(
+              isFirstTimeUser
+                ? `Chào mừng ${auth.user.name || 'bạn'}! Đã tạo không gian CV riêng.`
+                : `Đã đồng bộ dữ liệu của ${auth.user.name || 'tài khoản'}.`
+            );
+          }
+          return;
+        } catch (err) {
+          console.warn('[CVBuilderClient] Cloud profile load warning:', err);
+        }
       }
-    );
-    profiles.setProfiles(loadedProfiles);
-    profiles.setActiveProfileId(initialActiveId);
-  }, [builder.isLoading]);
+
+      // 2. Guest or offline user
+      const { profiles: loadedProfiles, activeProfileId: initialActiveId } =
+        loadProfilesFromStorage(
+          builder.defaultCVData,
+          builder.defaultEnglishCVData,
+          {
+            template: builder.template,
+            accentColor: builder.accentColor,
+            fontFamily: builder.fontFamily,
+            isCompact: builder.isCompact,
+            sectionOrder: builder.sectionOrder,
+            sectionVisibility: builder.sectionVisibility,
+            activeLang: builder.lang,
+          },
+          currentUserId
+        );
+
+      profiles.setProfiles(loadedProfiles);
+      profiles.setActiveProfileId(initialActiveId);
+
+      const targetProfile =
+        loadedProfiles.find((p) => p.id === initialActiveId) || loadedProfiles[0];
+      if (targetProfile) {
+        applyProfileToBuilder(targetProfile, builder);
+      }
+
+      if (isSwitchingFromAnotherUser && currentUserId === 'guest') {
+        builder.setToastMessage('Đã chuyển về hồ sơ Khách.');
+      }
+    }
+
+    loadUserProfiles();
+  }, [
+    auth.user.id,
+    auth.isSupabaseReady,
+    builder.isLoading,
+  ]);
 
   // Auto-sync profile to storage on state change
   useEffect(() => {
@@ -187,7 +274,7 @@ export default function CVBuilderClient({
           }
           return p;
         });
-        saveProfilesToStorage(next, profiles.activeProfileId);
+        saveProfilesToStorage(next, profiles.activeProfileId, auth.user.id);
         return next;
       });
     } catch (e) {
@@ -208,6 +295,45 @@ export default function CVBuilderClient({
     builder.sectionOrder,
     builder.sectionVisibility,
     profiles.activeProfileId,
+    builder.isLoading,
+    auth.user.id,
+  ]);
+
+  // Debounced auto-sync to Supabase Cloud for authenticated user
+  useEffect(() => {
+    if (
+      builder.isLoading ||
+      !auth.isAuthenticated ||
+      auth.isGuest ||
+      !auth.isSupabaseReady ||
+      !auth.user.id
+    ) {
+      return;
+    }
+    if (!profiles.profiles || profiles.profiles.length === 0) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        const { uploadUserDataToSupabase } = await import('@/lib/supabaseSync');
+        await uploadUserDataToSupabase(
+          auth.user.id,
+          profiles.profiles,
+          [],
+          profiles.activeProfileId
+        );
+      } catch (e) {
+        // background sync catch
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [
+    profiles.profiles,
+    profiles.activeProfileId,
+    auth.user.id,
+    auth.isAuthenticated,
+    auth.isGuest,
+    auth.isSupabaseReady,
     builder.isLoading,
   ]);
 
@@ -1031,6 +1157,7 @@ export default function CVBuilderClient({
         isOpen={modals.showJobTrackerModal}
         onClose={() => modals.setShowJobTrackerModal(false)}
         lang={builder.lang}
+        userId={auth.user.id}
       />
 
       {/* 5.13: PROGRESSIVE AUTH & CLOUD SYNC MODAL */}

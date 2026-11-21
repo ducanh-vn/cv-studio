@@ -2,6 +2,17 @@ import type { KanbanColumnDef, JobApplication } from '@/types/jobTracker';
 
 export const JOB_TRACKER_STORAGE_KEY = 'cv_studio_job_tracker_v1';
 
+/**
+ * Returns user-scoped storage key for job applications.
+ * Guarantees that applications for User A never mix with User B or Guest.
+ */
+export function getUserJobTrackerStorageKey(userId?: string): string {
+  if (!userId || userId === 'guest') {
+    return 'cv_studio_job_tracker_guest';
+  }
+  return `cv_studio_job_tracker_${userId}`;
+}
+
 export const KANBAN_COLUMNS: KanbanColumnDef[] = [
   {
     id: 'wishlist',

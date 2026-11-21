@@ -30,6 +30,7 @@ import {
 } from '@/lib/cvTypography';
 
 export interface UseCVProfilesOptions {
+  userId?: string;
   cv: CVData;
   cvVi: CVData;
   cvEn: CVData;
@@ -95,6 +96,7 @@ export interface UseCVProfilesReturn {
 }
 
 export function useCVProfiles({
+  userId = 'guest',
   cv,
   cvVi,
   cvEn,
@@ -217,7 +219,7 @@ export function useCVProfiles({
 
       setActiveProfileId(target.id);
       setProfiles(updatedProfiles);
-      saveProfilesToStorage(updatedProfiles, target.id);
+      saveProfilesToStorage(updatedProfiles, target.id, userId);
       setIsProfileMenuOpen(false);
 
       setToastMessage(
@@ -256,6 +258,7 @@ export function useCVProfiles({
       setSectionOrder,
       setSectionVisibility,
       setToastMessage,
+      userId,
     ]
   );
 
@@ -287,7 +290,7 @@ export function useCVProfiles({
       const cloned = duplicateCVProfile(sourceData);
       const nextProfiles = [...profiles, cloned];
       setProfiles(nextProfiles);
-      saveProfilesToStorage(nextProfiles, cloned.id);
+      saveProfilesToStorage(nextProfiles, cloned.id, userId);
       handleSwitchProfile(cloned.id);
 
       setToastMessage(
@@ -314,6 +317,7 @@ export function useCVProfiles({
       sectionVisibility,
       handleSwitchProfile,
       setToastMessage,
+      userId,
     ]
   );
 
@@ -344,7 +348,7 @@ export function useCVProfiles({
 
     const nextProfiles = [...profiles, created];
     setProfiles(nextProfiles);
-    saveProfilesToStorage(nextProfiles, created.id);
+    saveProfilesToStorage(nextProfiles, created.id, userId);
     handleSwitchProfile(created.id);
 
     setShowNewProfileModal(false);
@@ -396,13 +400,13 @@ export function useCVProfiles({
       });
 
       setProfiles(nextProfiles);
-      saveProfilesToStorage(nextProfiles, activeProfileId);
+      saveProfilesToStorage(nextProfiles, activeProfileId, userId);
       setEditingProfileId(null);
       setEditingProfileName('');
 
       setToastMessage(lang === 'en' ? 'Profile renamed!' : 'Đã đổi tên phiên bản thành công!');
     },
-    [profiles, activeProfileId, setToastMessage]
+    [profiles, activeProfileId, setToastMessage, userId]
   );
 
   const handleDeleteProfile = useCallback(
@@ -427,7 +431,7 @@ export function useCVProfiles({
       }
 
       setProfiles(remaining);
-      saveProfilesToStorage(remaining, nextActiveId);
+      saveProfilesToStorage(remaining, nextActiveId, userId);
 
       if (activeProfileId === profileId) {
         handleSwitchProfile(nextActiveId);
@@ -435,7 +439,7 @@ export function useCVProfiles({
 
       setToastMessage(lang === 'en' ? 'Profile deleted.' : 'Đã xóa phiên bản CV.');
     },
-    [profiles, activeProfileId, lang, handleSwitchProfile, setToastMessage]
+    [profiles, activeProfileId, lang, handleSwitchProfile, setToastMessage, userId]
   );
 
   return {

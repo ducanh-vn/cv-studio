@@ -90,3 +90,51 @@ export async function fetchUserDataFromSupabase(
     return null;
   }
 }
+
+/**
+ * Synchronizes user data on login: loads existing cloud data for the user,
+ * or seeds an initial cloud record if this is the user's first login.
+ */
+export async function initializeUserDataOnLogin(
+  userId: string,
+  defaultProfiles: any[],
+  defaultJobs: any[],
+  activeProfileId?: string
+): Promise<{
+  profiles: any[];
+  jobApplications: any[];
+  activeProfileId: string;
+  isFirstTimeUser: boolean;
+}> {
+  if (!isSupabaseConfigured() || !userId || userId === 'guest') {
+    return {
+      profiles: defaultProfiles,
+      jobApplications: defaultJobs,
+      activeProfileId: activeProfileId || (defaultProfiles[0]?.id ?? 'profile-main'),
+      isFirstTimeUser: false,
+    };
+  }
+
+  const cloudRecord = await fetchUserDataFromSupabase(userId);
+  if (cloudRecord && Array.isArray(cloudRecord.profiles) && cloudRecord.profiles.length > 0) {
+    return {
+      profiles: cloudRecord.profiles,
+      jobApplications: Array.isArray(cloudRecord.job_applications)
+        ? cloudRecord.job_applications
+        : defaultJobs,
+      activeProfileId: cloudRecord.active_profile_id || cloudRecord.profiles[0].id,
+      isFirstTimeUser: false,
+    };
+  }
+
+  // First time login: seed cloud record with initial clean data so user starts fresh
+  const initialActiveId = activeProfileId || (defaultProfiles[0]?.id ?? 'profile-main');
+  await uploadUserDataToSupabase(userId, defaultProfiles, defaultJobs, initialActiveId);
+
+  return {
+    profiles: defaultProfiles,
+    jobApplications: defaultJobs,
+    activeProfileId: initialActiveId,
+    isFirstTimeUser: true,
+  };
+}

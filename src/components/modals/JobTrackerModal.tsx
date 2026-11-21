@@ -23,6 +23,7 @@ export interface JobTrackerModalProps {
   isOpen: boolean;
   onClose: () => void;
   lang?: 'vi' | 'en';
+  userId?: string;
 }
 
 const COLUMN_ICONS: Record<string, React.ReactNode> = {
@@ -37,6 +38,7 @@ export const JobTrackerModal: React.FC<JobTrackerModalProps> = ({
   isOpen,
   onClose,
   lang = 'vi',
+  userId = 'guest',
 }) => {
   const {
     filteredJobs,

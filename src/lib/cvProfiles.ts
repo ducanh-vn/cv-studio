@@ -1,4 +1,7 @@
-import { CVTypographyConfig } from './cvTypography';
+import { CVTypographyConfig, DEFAULT_TYPOGRAPHY_CONFIG } from './cvTypography';
+import { sanitizeCVTechStuttering } from './techLinter';
+import { ensureCustomLinks } from './customTechLinks';
+import { DEFAULT_SECTION_ORDER, DEFAULT_SECTION_VISIBILITY } from '@/constants/cvConstants';
 
 export interface CVProfile {
   id: string;
@@ -26,6 +29,27 @@ export interface CVProfile {
 
 export const STORAGE_PROFILES_KEY = 'ducanh_cv_profiles_v1';
 export const STORAGE_ACTIVE_PROFILE_ID_KEY = 'ducanh_active_cv_profile_id';
+
+/**
+ * Returns user-scoped storage key for CV profiles list.
+ * Guarantees that profiles for User A never mix with User B or Guest.
+ */
+export function getUserProfilesStorageKey(userId?: string): string {
+  if (!userId || userId === 'guest') {
+    return 'cv_profiles_guest';
+  }
+  return `cv_profiles_${userId}`;
+}
+
+/**
+ * Returns user-scoped storage key for the currently active profile ID.
+ */
+export function getUserActiveProfileKey(userId?: string): string {
+  if (!userId || userId === 'guest') {
+    return 'cv_active_profile_guest';
+  }
+  return `cv_active_profile_${userId}`;
+}
 
 /**
  * Creates initial profiles, using any existing saved CV as Profile 1,
@@ -99,22 +123,93 @@ export function createInitialProfiles(
   return [profile1, profile2];
 }
 
+export interface BuilderApplyTarget {
+  setCvVi: (cv: any) => void;
+  setCvEn: (cv: any) => void;
+  setLang: (lang: any) => void;
+  setCvState: (cv: any) => void;
+  setCoverLetterVi: (cl: any) => void;
+  setCoverLetterEn: (cl: any) => void;
+  setTemplate: (t: any) => void;
+  setAccentColor: (c: any) => void;
+  setFontFamily: (f: any) => void;
+  setIsCompact: (compact: boolean) => void;
+  setTypographyConfig: (config: any) => void;
+  setSectionOrder: (order: any) => void;
+  setSectionVisibility: (vis: any) => void;
+}
+
 /**
- * Loads profiles list from localStorage, or creates initial profiles if none exist.
+ * Applies a CVProfile's content and appearance settings directly to the builder state.
+ */
+export function applyProfileToBuilder(
+  target: CVProfile,
+  builder: BuilderApplyTarget
+): void {
+  const targetVi = sanitizeCVTechStuttering({
+    ...target.cvVi,
+    customLinks: ensureCustomLinks(target.cvVi),
+  });
+  const targetEn = sanitizeCVTechStuttering({
+    ...target.cvEn,
+    customLinks: ensureCustomLinks(target.cvEn),
+  });
+  builder.setCvVi(targetVi);
+  builder.setCvEn(targetEn);
+  builder.setLang(target.activeLang || 'vi');
+  builder.setCvState(target.activeLang === 'en' ? targetEn : targetVi);
+  if (target.coverLetterVi) builder.setCoverLetterVi(target.coverLetterVi);
+  if (target.coverLetterEn) builder.setCoverLetterEn(target.coverLetterEn);
+  builder.setTemplate(target.template || 'rabbit');
+  builder.setAccentColor(target.accentColor || 'blue');
+  builder.setFontFamily(target.fontFamily || 'inter');
+  builder.setIsCompact(target.isCompact ?? false);
+  if (target.typography) {
+    builder.setTypographyConfig(target.typography);
+  } else {
+    builder.setTypographyConfig(DEFAULT_TYPOGRAPHY_CONFIG);
+  }
+  builder.setSectionOrder(
+    target.sectionOrder?.length ? target.sectionOrder : DEFAULT_SECTION_ORDER
+  );
+  builder.setSectionVisibility(
+    target.sectionVisibility || DEFAULT_SECTION_VISIBILITY
+  );
+}
+
+/**
+ * Loads profiles list from localStorage, scoped per user ID,
+ * or creates initial profiles if none exist.
  */
 export function loadProfilesFromStorage(
   fallbackVi: any,
   fallbackEn: any,
-  currentSettings: any
+  currentSettings: any,
+  userId?: string
 ): { profiles: CVProfile[]; activeProfileId: string } {
   if (typeof window === 'undefined') {
     const initials = createInitialProfiles(fallbackVi, fallbackEn, currentSettings);
     return { profiles: initials, activeProfileId: initials[0].id };
   }
 
+  const profilesKey = getUserProfilesStorageKey(userId);
+  const activeKey = getUserActiveProfileKey(userId);
+
   try {
-    const raw = localStorage.getItem(STORAGE_PROFILES_KEY);
-    const savedActiveId = localStorage.getItem(STORAGE_ACTIVE_PROFILE_ID_KEY);
+    let raw = localStorage.getItem(profilesKey);
+    let savedActiveId = localStorage.getItem(activeKey);
+
+    // Migration fallback: if guest and no guest key yet, import legacy single-user data
+    if (!raw && (!userId || userId === 'guest')) {
+      const legacyRaw = localStorage.getItem(STORAGE_PROFILES_KEY);
+      if (legacyRaw) {
+        raw = legacyRaw;
+        savedActiveId = localStorage.getItem(STORAGE_ACTIVE_PROFILE_ID_KEY);
+        // Persist into new guest key
+        localStorage.setItem(profilesKey, raw);
+        if (savedActiveId) localStorage.setItem(activeKey, savedActiveId);
+      }
+    }
 
     if (raw) {
       const parsed = JSON.parse(raw) as CVProfile[];
@@ -130,20 +225,26 @@ export function loadProfilesFromStorage(
     console.warn('Failed to parse saved CV profiles from storage:', err);
   }
 
-  // If no profiles in storage, initialize
+  // If no profiles in storage for this user, initialize fresh defaults
   const initials = createInitialProfiles(fallbackVi, fallbackEn, currentSettings);
-  saveProfilesToStorage(initials, initials[0].id);
+  saveProfilesToStorage(initials, initials[0].id, userId);
   return { profiles: initials, activeProfileId: initials[0].id };
 }
 
 /**
- * Saves profiles list and active profile ID to localStorage.
+ * Saves profiles list and active profile ID to localStorage for a specific user ID.
  */
-export function saveProfilesToStorage(profiles: CVProfile[], activeProfileId: string): void {
+export function saveProfilesToStorage(
+  profiles: CVProfile[],
+  activeProfileId: string,
+  userId?: string
+): void {
   if (typeof window === 'undefined') return;
+  const profilesKey = getUserProfilesStorageKey(userId);
+  const activeKey = getUserActiveProfileKey(userId);
   try {
-    localStorage.setItem(STORAGE_PROFILES_KEY, JSON.stringify(profiles));
-    localStorage.setItem(STORAGE_ACTIVE_PROFILE_ID_KEY, activeProfileId);
+    localStorage.setItem(profilesKey, JSON.stringify(profiles));
+    localStorage.setItem(activeKey, activeProfileId);
   } catch (err) {
     console.warn('Failed to save CV profiles to storage:', err);
   }

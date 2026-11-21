@@ -2,14 +2,18 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { JobApplication, JobApplicationStatus } from '@/types/jobTracker';
-import { JOB_TRACKER_STORAGE_KEY, DEFAULT_SAMPLE_JOBS } from '@/constants/jobTrackerConstants';
+import {
+  JOB_TRACKER_STORAGE_KEY,
+  DEFAULT_SAMPLE_JOBS,
+  getUserJobTrackerStorageKey,
+} from '@/constants/jobTrackerConstants';
 import {
   calculateTrackerStats,
   filterJobs,
   createNewApplication,
 } from '@/lib/jobTrackerHelpers';
 
-export function useJobTracker() {
+export function useJobTracker(userId: string = 'guest') {
   const [jobs, setJobs] = useState<JobApplication[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,13 +21,25 @@ export function useJobTracker() {
   const [editingJob, setEditingJob] = useState<JobApplication | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  // Initialize from localStorage
+  // Initialize from user-scoped localStorage
   useEffect(() => {
+    setIsLoaded(false);
+    const storageKey = getUserJobTrackerStorageKey(userId);
     try {
-      const raw = localStorage.getItem(JOB_TRACKER_STORAGE_KEY);
+      let raw = localStorage.getItem(storageKey);
+
+      // Migration fallback: if guest and no guest key yet, import legacy single-user data
+      if (!raw && (!userId || userId === 'guest')) {
+        const legacyRaw = localStorage.getItem(JOB_TRACKER_STORAGE_KEY);
+        if (legacyRaw) {
+          raw = legacyRaw;
+          localStorage.setItem(storageKey, legacyRaw);
+        }
+      }
+
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           setJobs(parsed);
           setIsLoaded(true);
           return;
@@ -33,20 +49,21 @@ export function useJobTracker() {
       console.warn('Failed to parse saved job applications:', e);
     }
 
-    // Default sample seed
+    // Default sample seed for new accounts or guests
     setJobs(DEFAULT_SAMPLE_JOBS);
     setIsLoaded(true);
-  }, []);
+  }, [userId]);
 
-  // Sync to localStorage
+  // Sync to user-scoped localStorage
   useEffect(() => {
     if (!isLoaded) return;
+    const storageKey = getUserJobTrackerStorageKey(userId);
     try {
-      localStorage.setItem(JOB_TRACKER_STORAGE_KEY, JSON.stringify(jobs));
+      localStorage.setItem(storageKey, JSON.stringify(jobs));
     } catch (e) {
       console.error('Failed to save job applications:', e);
     }
-  }, [jobs, isLoaded]);
+  }, [jobs, isLoaded, userId]);
 
   const stats = useMemo(() => calculateTrackerStats(jobs), [jobs]);
 
