@@ -159,7 +159,7 @@ export const DataTab: React.FC<DataTabProps> = ({
                         className="w-full py-2 px-3 rounded-lg border border-dashed border-cyan-500/40 hover:border-cyan-400 text-cyan-300 hover:text-white flex items-center justify-center space-x-1.5 transition-all text-xs cursor-pointer bg-cyan-500/5 hover:bg-cyan-500/10"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>{lang === 'en' ? '+ Create New Profile' : '+ Thêm phiên bản CV mới'}</span>
+                        <span>{lang === 'en' ? 'Create New Profile' : 'Thêm phiên bản CV mới'}</span>
                       </button>
                     </div>
                   </div>

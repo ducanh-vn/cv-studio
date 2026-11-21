@@ -323,7 +323,7 @@ export function EditorTopbar({
                         className="w-full py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-cyan-400 hover:text-cyan-300 font-medium flex items-center justify-center space-x-1.5 transition-colors cursor-pointer text-xs"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>{lang === 'en' ? '+ Create New CV Profile' : '+ Thêm phiên bản CV mới'}</span>
+                        <span>{lang === 'en' ? 'Create New CV Profile' : 'Thêm phiên bản CV mới'}</span>
                       </button>
                       <button
                         type="button"

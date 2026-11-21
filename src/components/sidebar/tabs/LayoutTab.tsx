@@ -398,7 +398,7 @@ export const LayoutTab: React.FC<LayoutTabProps> = ({
                         className="w-full py-2 px-3 rounded-xl border border-dashed border-indigo-500/40 hover:border-indigo-400 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-300 text-xs font-semibold flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-xs"
                       >
                         <PlusCircle className="w-4 h-4 text-indigo-400" />
-                        <span>{lang === 'en' ? '+ Add Custom Section' : '+ Thêm mục tùy chỉnh mới'}</span>
+                        <span>{lang === 'en' ? 'Add Custom Section' : 'Thêm mục tùy chỉnh mới'}</span>
                       </button>
 
                       {showAddSectionMenu && (

@@ -864,7 +864,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
                                 className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center space-x-1 font-semibold cursor-pointer"
                               >
                                 <Plus className="w-3 h-3" />
-                                <span>{lang === 'en' ? '+ Add Item' : '+ Thêm dòng mới'}</span>
+                                <span>{lang === 'en' ? 'Add Item' : 'Thêm dòng mới'}</span>
                               </button>
                             </div>
 
