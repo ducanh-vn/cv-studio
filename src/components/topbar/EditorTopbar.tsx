@@ -293,7 +293,10 @@ export function EditorTopbar({
                                     {profiles.length > 1 && (
                                       <button
                                         type="button"
-                                        onClick={() => handleDeleteProfile(p.id)}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeleteProfile(p.id);
+                                        }}
                                         className="p-1 rounded text-neutral-400 hover:text-rose-400 hover:bg-white/10 transition-colors cursor-pointer"
                                         title="Xóa phiên bản này"
                                       >

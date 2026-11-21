@@ -159,6 +159,57 @@ export function useCVProfiles({
     return profiles.find((p) => p.id === activeProfileId) || profiles[0];
   }, [profiles, activeProfileId]);
 
+  const applyProfileDataToBuilder = useCallback(
+    (target: CVProfile) => {
+      const targetVi = sanitizeCVTechStuttering({
+        ...target.cvVi,
+        customLinks: ensureCustomLinks(target.cvVi),
+      });
+      const targetEn = sanitizeCVTechStuttering({
+        ...target.cvEn,
+        customLinks: ensureCustomLinks(target.cvEn),
+      });
+      setCvVi(targetVi);
+      setCvEn(targetEn);
+      setLang(target.activeLang || 'vi');
+      setCvState(target.activeLang === 'en' ? targetEn : targetVi);
+      if (target.coverLetterVi) setCoverLetterVi(target.coverLetterVi);
+      if (target.coverLetterEn) setCoverLetterEn(target.coverLetterEn);
+      setTemplate((target.template as TemplateId) || 'rabbit');
+      setAccentColor((target.accentColor as any) || 'blue');
+      setFontFamily((target.fontFamily as CVFontFamily) || 'inter');
+      setIsCompact(target.isCompact ?? false);
+      if (target.typography) {
+        setTypographyConfig(target.typography);
+      } else {
+        setTypographyConfig(DEFAULT_TYPOGRAPHY_CONFIG);
+      }
+      setSectionOrder(
+        target.sectionOrder?.length
+          ? (target.sectionOrder as SectionKey[])
+          : DEFAULT_SECTION_ORDER
+      );
+      setSectionVisibility(
+        target.sectionVisibility || DEFAULT_SECTION_VISIBILITY
+      );
+    },
+    [
+      setCvVi,
+      setCvEn,
+      setLang,
+      setCvState,
+      setCoverLetterVi,
+      setCoverLetterEn,
+      setTemplate,
+      setAccentColor,
+      setFontFamily,
+      setIsCompact,
+      setTypographyConfig,
+      setSectionOrder,
+      setSectionVisibility,
+    ]
+  );
+
   const handleSwitchProfile = useCallback(
     (targetProfileId: string) => {
       if (targetProfileId === activeProfileId) {
@@ -197,25 +248,7 @@ export function useCVProfiles({
       if (!target) return;
 
       // 3. Load target profile into active state
-      const targetVi = sanitizeCVTechStuttering({ ...target.cvVi, customLinks: ensureCustomLinks(target.cvVi) });
-      const targetEn = sanitizeCVTechStuttering({ ...target.cvEn, customLinks: ensureCustomLinks(target.cvEn) });
-      setCvVi(targetVi);
-      setCvEn(targetEn);
-      setLang(target.activeLang || 'vi');
-      setCvState(target.activeLang === 'en' ? targetEn : targetVi);
-      if (target.coverLetterVi) setCoverLetterVi(target.coverLetterVi);
-      if (target.coverLetterEn) setCoverLetterEn(target.coverLetterEn);
-      setTemplate((target.template as TemplateId) || 'rabbit');
-      setAccentColor((target.accentColor as any) || 'blue');
-      setFontFamily((target.fontFamily as CVFontFamily) || 'inter');
-      setIsCompact(target.isCompact ?? false);
-      if (target.typography) {
-        setTypographyConfig(target.typography);
-      } else {
-        setTypographyConfig(DEFAULT_TYPOGRAPHY_CONFIG);
-      }
-      setSectionOrder(target.sectionOrder?.length ? (target.sectionOrder as SectionKey[]) : DEFAULT_SECTION_ORDER);
-      setSectionVisibility(target.sectionVisibility || DEFAULT_SECTION_VISIBILITY);
+      applyProfileDataToBuilder(target);
 
       setActiveProfileId(target.id);
       setProfiles(updatedProfiles);
@@ -257,6 +290,7 @@ export function useCVProfiles({
       setTypographyConfig,
       setSectionOrder,
       setSectionVisibility,
+      applyProfileDataToBuilder,
       setToastMessage,
       userId,
     ]
@@ -316,6 +350,7 @@ export function useCVProfiles({
       sectionOrder,
       sectionVisibility,
       handleSwitchProfile,
+      applyProfileDataToBuilder,
       setToastMessage,
       userId,
     ]
@@ -426,20 +461,31 @@ export function useCVProfiles({
 
       const remaining = profiles.filter((p) => p.id !== profileId);
       let nextActiveId = activeProfileId;
+
       if (activeProfileId === profileId) {
-        nextActiveId = remaining[0].id;
+        const nextProfile = remaining[0];
+        nextActiveId = nextProfile.id;
+        applyProfileDataToBuilder(nextProfile);
       }
 
+      setActiveProfileId(nextActiveId);
       setProfiles(remaining);
       saveProfilesToStorage(remaining, nextActiveId, userId);
-
-      if (activeProfileId === profileId) {
-        handleSwitchProfile(nextActiveId);
-      }
+      setIsProfileMenuOpen(false);
 
       setToastMessage(lang === 'en' ? 'Profile deleted.' : 'Đã xóa phiên bản CV.');
     },
-    [profiles, activeProfileId, lang, handleSwitchProfile, setToastMessage, userId]
+    [
+      profiles,
+      activeProfileId,
+      lang,
+      applyProfileDataToBuilder,
+      setActiveProfileId,
+      setProfiles,
+      setToastMessage,
+      setIsProfileMenuOpen,
+      userId,
+    ]
   );
 
   return {
