@@ -660,7 +660,6 @@ export default function CVBuilderClient({
         setExportResolution={builder.setExportResolution}
         setParsedResult={modals.setParsedResult}
         setParseError={modals.setParseError}
-        onOpenJobTracker={() => modals.setShowJobTrackerModal(true)}
         auth={{
           user: auth.user,
           isAuthenticated: auth.isAuthenticated,
@@ -688,6 +687,7 @@ export default function CVBuilderClient({
           isDrawerOpen={builder.isDrawerOpen}
           setIsDrawerOpen={builder.setIsDrawerOpen}
           setDocMode={builder.setDocMode}
+          onOpenJobTracker={() => modals.setShowJobTrackerModal(true)}
         />
 
         {/* ================= B. TOOL DRAWER (320px) ================= */}

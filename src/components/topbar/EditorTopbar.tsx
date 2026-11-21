@@ -414,19 +414,6 @@ export function EditorTopbar({
               <span className="hidden sm:inline">{lang === 'en' ? 'Preview' : 'Xem trước'}</span>
             </button>
 
-            {/* Nút Bảng theo dõi ứng tuyển (Kanban Tracker) */}
-            {onOpenJobTracker && (
-              <button
-                type="button"
-                onClick={onOpenJobTracker}
-                className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 hover:text-white text-xs font-medium transition-all cursor-pointer shadow-xs"
-                title={lang === 'en' ? 'Job Application Kanban Tracker' : 'Bảng theo dõi ứng tuyển (Kanban)'}
-              >
-                <Kanban className="w-3.5 h-3.5 text-amber-400" />
-                <span className="hidden md:inline">{lang === 'en' ? 'Job Tracker' : 'Ứng tuyển'}</span>
-              </button>
-            )}
-
             {/* Nút Chia sẻ (chỉ hiện icon Share có tooltip) */}
             <button
               type="button"

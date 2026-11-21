@@ -8,6 +8,7 @@ import {
   Sparkles,
   FileJson,
   Mail,
+  Kanban,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -27,6 +28,7 @@ export interface SidebarRailProps {
   isDrawerOpen: boolean;
   setIsDrawerOpen: (open: boolean | ((prev: boolean) => boolean)) => void;
   setDocMode?: (mode: 'cv' | 'cover_letter') => void;
+  onOpenJobTracker?: () => void;
 }
 
 export function SidebarRail({
@@ -40,6 +42,7 @@ export function SidebarRail({
   isDrawerOpen,
   setIsDrawerOpen,
   setDocMode,
+  onOpenJobTracker,
 }: SidebarRailProps) {
   if (isPreviewMode || isPublicView) return null;
 
@@ -133,6 +136,26 @@ export function SidebarRail({
                   </button>
                 );
               })}
+
+              {/* Nút Bảng theo dõi ứng tuyển (Kanban Tracker) */}
+              {onOpenJobTracker && (
+                <button
+                  type="button"
+                  onClick={onOpenJobTracker}
+                  className="w-full py-3 px-1 flex flex-col items-center justify-center relative transition-all cursor-pointer text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 border-l-2 border-transparent hover:border-emerald-500 group"
+                  title={lang === 'en' ? 'Job Application Kanban Tracker' : 'Bảng theo dõi ứng tuyển (Kanban)'}
+                >
+                  <div className="relative flex items-center justify-center">
+                    <Kanban className="w-5 h-5 mb-1 text-emerald-400 group-hover:scale-110 transition-transform" />
+                    <span className="absolute -top-1 -right-2 text-[8px] font-bold font-mono px-1 py-0.2 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 leading-none shadow-xs">
+                      JOB
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-medium tracking-tight text-center leading-tight mt-0.5 text-neutral-300 group-hover:text-white">
+                    {lang === 'en' ? 'Tracker' : 'Ứng tuyển'}
+                  </span>
+                </button>
+              )}
             </div>
 
             {/* Bottom: Collapse / Expand Rail Toggle */}
