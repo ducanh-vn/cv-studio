@@ -23,6 +23,13 @@ import { CVQRConfig, getQRTargetText } from '@/lib/cvQRCode';
 import type { CVTypographyConfig } from '@/lib/cvTypography';
 import { CVStrengthEvaluation } from '@/lib/cvStrength';
 import { CoverLetterData } from '@/lib/coverLetter';
+import { useA4PageGauge } from '@/hooks/useA4PageGauge';
+import { useCVPageLayout } from '@/hooks/useCVPageLayout';
+import { A4PageGaugeBadge } from '@/components/canvas/A4PageGaugeBadge';
+import { A4PageOverflowOverlay } from '@/components/canvas/A4PageOverflowOverlay';
+import { MultiPageSheetSeparator } from '@/components/canvas/MultiPageSheetSeparator';
+import { PageNavigatorControls } from '@/components/canvas/PageNavigatorControls';
+
 
 export interface CVCanvasWorkspaceProps {
   currentCanvasBg: CanvasBgThemeOption;
@@ -32,6 +39,7 @@ export interface CVCanvasWorkspaceProps {
   t: any;
   activeTemplateDef: TemplateDef;
   isCompact: boolean;
+  setIsCompact?: (compact: boolean | ((prev: boolean) => boolean)) => void;
   cvStrength: CVStrengthEvaluation;
   zoom: number;
   currentCoverLetter: CoverLetterData;
@@ -42,6 +50,7 @@ export interface CVCanvasWorkspaceProps {
   isLoading: boolean;
   fontClass: string;
   typographyConfig: CVTypographyConfig;
+  setTypographyConfig?: (config: CVTypographyConfig | ((prev: CVTypographyConfig) => CVTypographyConfig)) => void;
   commonTemplateProps: CVTemplateProps;
   activeQrConfig: CVQRConfig;
   qrDataUrl: string;
@@ -58,6 +67,7 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
   t,
   activeTemplateDef,
   isCompact,
+  setIsCompact,
   cvStrength,
   zoom,
   currentCoverLetter,
@@ -68,6 +78,7 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
   isLoading,
   fontClass,
   typographyConfig,
+  setTypographyConfig,
   commonTemplateProps,
   activeQrConfig,
   qrDataUrl,
@@ -75,13 +86,37 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
   cv,
   paperRef,
 }) => {
+  const internalPaperRef = React.useRef<HTMLDivElement>(null);
+  const targetPaperRef = paperRef || internalPaperRef;
+
+  const { metrics, autoFitToSinglePage } = useA4PageGauge({
+    paperRef: targetPaperRef,
+    lang,
+    typographyConfig,
+    setTypographyConfig,
+    setIsCompact,
+    dependencies: [cv, template, isCompact, typographyConfig, lang, isLoading],
+  });
+
+  const {
+    multiPageInfo,
+    pageMode,
+    setPageMode,
+    showPageNumbers,
+    setShowPageNumbers,
+    scrollToPage,
+  } = useCVPageLayout({
+    paperRef: targetPaperRef,
+    lang,
+    dependencies: [cv, template, isCompact, typographyConfig, lang],
+  });
   return (
     <main
       className="flex-1 h-full overflow-y-auto relative flex flex-col items-center py-8 sm:py-12 px-4 sm:px-10 pb-32 no-scrollbar transition-all"
       style={currentCanvasBg.style}
     >
       {/* Minimal Floating Status Pill */}
-      <div className="no-print mb-4 px-4 py-1.5 rounded-full bg-[#161B26]/90 border border-white/10 backdrop-blur-md shadow-lg text-[11px] text-neutral-400 flex items-center space-x-2 select-none flex-wrap justify-center flex-shrink-0">
+      <div className="no-print relative z-10 mb-4 px-3 sm:px-4 py-1.5 rounded-full bg-[#161B26]/90 border border-white/10 backdrop-blur-md shadow-lg text-[11px] text-neutral-400 flex items-center space-x-1.5 sm:space-x-2 select-none flex-wrap justify-center flex-shrink-0 max-w-full">
         {isPublicView ? (
           <>
             <span className="flex items-center space-x-1.5 text-emerald-400 font-semibold">
@@ -143,6 +178,29 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
               {isCompact ? (lang === 'en' ? '1-Page Fit' : 'Chuẩn 1 trang A4') : (lang === 'en' ? 'Standard' : 'Tiêu chuẩn')}
             </span>
             <span className="text-neutral-600">•</span>
+            {/* Live A4 Page Capacity Gauge Badge */}
+            <A4PageGaugeBadge
+              metrics={metrics}
+              lang={lang}
+              onAutoFit={autoFitToSinglePage}
+            />
+            {/* Multi-Page Navigator Controls */}
+            {multiPageInfo.isMultiPage && (
+              <>
+                <span className="text-neutral-600">•</span>
+                <PageNavigatorControls
+                  multiPageInfo={multiPageInfo}
+                  pageMode={pageMode}
+                  onSelectMode={setPageMode}
+                  onScrollToPage={scrollToPage}
+                  showPageNumbers={showPageNumbers}
+                  onTogglePageNumbers={() => setShowPageNumbers((p) => !p)}
+                  lang={lang}
+                  isPublicView={isPublicView}
+                />
+              </>
+            )}
+            <span className="text-neutral-600">•</span>
             <span
               className="flex items-center space-x-1 font-mono font-semibold"
               style={{
@@ -152,8 +210,8 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
               <Gauge className="w-3 h-3" />
               <span>{cvStrength.score}% ATS</span>
             </span>
-            <span className="text-neutral-600 hidden sm:inline">•</span>
-            <span className="text-neutral-400 hidden sm:inline">
+            <span className="text-neutral-600 hidden xl:inline">•</span>
+            <span className="text-neutral-400 hidden xl:inline">
               {lang === 'en' ? 'Click any text on CV to edit directly' : 'Nhấp trực tiếp vào chữ để sửa'}
             </span>
           </>
@@ -183,7 +241,7 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
             <CVSkeletonLoading />
           ) : (
             <div
-              ref={paperRef}
+              ref={targetPaperRef}
               id="cv-paper"
               className={`cv-paper bg-white text-neutral-900 shadow-2xl relative w-[210mm] min-h-[297mm] rounded-sm ${fontClass} ${
                 isCompact ? 'cv-compact leading-snug' : 'leading-relaxed'
@@ -199,15 +257,41 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
                 ['--cv-pad-left-right' as any]: `${typographyConfig.pagePaddingLeftRight}px`,
               }}
             >
-              {/* 1-Page A4 Cutoff Indicator Line (Only visible on screen, never printed) */}
-              <div
-                className="no-print absolute left-0 right-0 border-b-2 border-dashed border-amber-500/80 z-30 pointer-events-none flex items-center justify-end pr-3 select-none"
-                style={{ top: '297mm' }}
-              >
-                <span className="bg-amber-500 text-black text-[9px] font-bold px-2 py-0.5 rounded-t font-mono shadow-sm tracking-wide">
-                  ✂ Giới hạn trang 1 (297mm) — Nội dung bên dưới sẽ tràn sang trang 2
-                </span>
-              </div>
+              {/* If Single Page Mode or only 1 page: Show Single-page Cutoff Line & Overflow Overlay System */}
+              {pageMode === 'single' || !multiPageInfo.isMultiPage ? (
+                <A4PageOverflowOverlay
+                  metrics={metrics}
+                  lang={lang}
+                  onAutoFit={autoFitToSinglePage}
+                  isPublicView={isPublicView}
+                />
+              ) : (
+                /* Multi-Page Sheet Demarcation Separators */
+                Array.from({ length: multiPageInfo.totalPages - 1 }, (_, i) => i + 2).map((pageNum) => (
+                  <MultiPageSheetSeparator
+                    key={pageNum}
+                    pageNumber={pageNum}
+                    lang={lang}
+                    onScrollToPage={scrollToPage}
+                    isPublicView={isPublicView}
+                  />
+                ))
+              )}
+
+              {/* Optional Subtle Page Number Indicators on Canvas sheets */}
+              {showPageNumbers && multiPageInfo.totalPages > 1 && (
+                <div className="no-print pointer-events-none select-none">
+                  {multiPageInfo.sheets.map((s) => (
+                    <div
+                      key={s.pageNumber}
+                      className="absolute right-6 text-[10px] text-neutral-400 font-mono tracking-wider opacity-75"
+                      style={{ top: `${s.bottomPx - 22}px` }}
+                    >
+                      {cv.name} • {s.pageNumber} / {multiPageInfo.totalPages}
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Dynamic Template Switcher (10 Architectural Templates) */}
               <CVTemplateSwitch {...commonTemplateProps} templateId={template} />

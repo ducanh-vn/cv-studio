@@ -394,6 +394,25 @@ body {
   scrollbar-width: none;
 }
 
+/* Multi-page Smart Page-Break Prevention Utilities */
+.page-break-avoid,
+.group\/timeline,
+.group\/project,
+.cv-section-block {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.cv-section-heading {
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+.page-break-before {
+  break-before: page !important;
+  page-break-before: always !important;
+}
+
 /* ================= PRINT / PDF EXPORT OPTIMIZATIONS ================= */
 @media print {
   *, *::before, *::after {
@@ -452,6 +471,7 @@ body {
     min-height: 297mm !important;
     transform: none !important;
     background-color: #ffffff !important;
+    overflow: visible !important;
   }
 
   .cv-compact {

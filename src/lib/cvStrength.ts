@@ -1,4 +1,4 @@
-import { CVData } from '@/components/CVBuilderClient';
+import type { CVData } from '@/types/cvBuilder';
 
 export interface ChecklistItem {
   id: string;

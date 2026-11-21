@@ -4,7 +4,7 @@
  * Extracts Personal Info, Summary, Skills, Work Experience, Projects, Education, and Tech Links.
  */
 
-import { CVData, EducationItem, CustomSection } from '@/components/CVBuilderClient';
+import type { CVData, EducationItem, CustomSection } from '@/types/cvBuilder';
 import { TimelineItem, ProjectItem } from '@/lib/data';
 import { CustomTechLink } from '@/lib/customTechLinks';
 import { TECH_KEYWORD_DICTIONARY } from './jdMatcher';

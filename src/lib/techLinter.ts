@@ -1,4 +1,4 @@
-import { CVData } from '@/components/CVBuilderClient';
+import type { CVData } from '@/types/cvBuilder';
 import { CoverLetterData } from '@/lib/coverLetter';
 import { TechCategory, TECH_CATEGORY_META } from '@/lib/jdMatcher';
 

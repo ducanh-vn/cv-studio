@@ -465,7 +465,7 @@ export function CVParserModal({
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2 p-3.5 rounded-xl bg-[#141A26] border border-white/10">
-                        {parsedResult.cv.skills.map((skill, idx) => (
+                        {parsedResult.cv.skills.map((skill: string, idx: number) => (
                           <span
                             key={idx}
                             className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 text-xs font-medium"
@@ -480,7 +480,7 @@ export function CVParserModal({
                   {/* Tab Timeline */}
                   {importPreviewTab === 'timeline' && (
                     <div className="space-y-3">
-                      {parsedResult.cv.timeline.map((item, idx) => (
+                      {parsedResult.cv.timeline.map((item: any, idx: number) => (
                         <div key={idx} className="p-3.5 rounded-xl bg-[#141A26] border border-white/10 space-y-2">
                           <div className="flex items-start justify-between gap-2">
                             <div>
@@ -508,7 +508,7 @@ export function CVParserModal({
                           {lang === 'en' ? 'No specific project section detected.' : 'Chưa phát hiện mục dự án riêng biệt.'}
                         </div>
                       ) : (
-                        parsedResult.cv.projects.map((proj, idx) => (
+                        parsedResult.cv.projects.map((proj: any, idx: number) => (
                           <div key={idx} className="p-3.5 rounded-xl bg-[#141A26] border border-white/10 space-y-2">
                             <div className="flex items-start justify-between gap-2">
                               <div>
@@ -538,7 +538,7 @@ export function CVParserModal({
                   {/* Tab Education */}
                   {importPreviewTab === 'education' && (
                     <div className="space-y-3">
-                      {parsedResult.cv.education.map((edu, idx) => (
+                      {parsedResult.cv.education.map((edu: any, idx: number) => (
                         <div key={idx} className="p-3.5 rounded-xl bg-[#141A26] border border-white/10 space-y-1.5">
                           <div className="flex items-start justify-between gap-2">
                             <div>

@@ -45,7 +45,7 @@ export function BasicTemplate({
   removeCustomSection = () => {},
 }: CVTemplateProps) {
   return (
-    <div className="p-10 space-y-6">
+    <div className={isCompact ? 'p-6 space-y-4' : 'p-8 sm:p-10 space-y-5 sm:space-y-6'}>
       <div className="text-center space-y-1.5 pb-4 border-b border-neutral-300">
         <div className="flex items-center justify-center space-x-4 pb-2">
           {cv.showAvatar && cv.avatar && (

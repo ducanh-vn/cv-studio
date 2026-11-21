@@ -24,9 +24,12 @@ import {
   FileText,
   Loader2,
   X,
+  Kanban,
 } from 'lucide-react';
 import type { CVData, Language } from '@/types/cvBuilder';
 import type { CVProfile } from '@/lib/cvProfiles';
+import { UserSyncMenu } from '@/components/auth';
+import type { AuthUser, SyncStatus } from '@/types/auth';
 import type { ImageExportFormat, ExportResolution } from '@/lib/exportImage';
 
 export interface EditorTopbarProps {
@@ -50,6 +53,7 @@ export interface EditorTopbarProps {
   canRedo?: boolean;
   setIsPreviewMode: (show: boolean) => void;
   setIsShareModalOpen: (show: boolean) => void;
+  onOpenJobTracker?: () => void;
   handlePrint: () => void;
   handleExportImage: (format: ImageExportFormat, resolution: ExportResolution) => void;
   isExportingImage: boolean;
@@ -61,6 +65,17 @@ export interface EditorTopbarProps {
   setParsedResult?: (val: any) => void;
   setParseError?: (val: any) => void;
   activeProfile?: CVProfile;
+  auth?: {
+    user: AuthUser;
+    isAuthenticated: boolean;
+    isGuest: boolean;
+    syncStatus: SyncStatus;
+    lastSyncedAt: string | null;
+    isSyncing: boolean;
+    onOpenAuthModal: () => void;
+    onLogout: () => void;
+    onTriggerSync: () => Promise<boolean>;
+  };
 }
 
 export function EditorTopbar({
@@ -84,6 +99,7 @@ export function EditorTopbar({
   canRedo = true,
   setIsPreviewMode,
   setIsShareModalOpen,
+  onOpenJobTracker,
   handlePrint,
   handleExportImage,
   isExportingImage,
@@ -95,6 +111,7 @@ export function EditorTopbar({
   setParsedResult,
   setParseError,
   activeProfile: customActiveProfile,
+  auth,
 }: EditorTopbarProps) {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
@@ -394,6 +411,19 @@ export function EditorTopbar({
               <span className="hidden sm:inline">{lang === 'en' ? 'Preview' : 'Xem trước'}</span>
             </button>
 
+            {/* Nút Bảng theo dõi ứng tuyển (Kanban Tracker) */}
+            {onOpenJobTracker && (
+              <button
+                type="button"
+                onClick={onOpenJobTracker}
+                className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 hover:text-white text-xs font-medium transition-all cursor-pointer shadow-xs"
+                title={lang === 'en' ? 'Job Application Kanban Tracker' : 'Bảng theo dõi ứng tuyển (Kanban)'}
+              >
+                <Kanban className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden md:inline">{lang === 'en' ? 'Job Tracker' : 'Ứng tuyển'}</span>
+              </button>
+            )}
+
             {/* Nút Chia sẻ (chỉ hiện icon Share có tooltip) */}
             <button
               type="button"
@@ -564,6 +594,22 @@ export function EditorTopbar({
                 </div>
               )}
             </div>
+
+            {/* User Profile & Cloud Sync Menu (Progressive Auth) */}
+            {auth && (
+              <UserSyncMenu
+                user={auth.user}
+                isAuthenticated={auth.isAuthenticated}
+                isGuest={auth.isGuest}
+                syncStatus={auth.syncStatus}
+                lastSyncedAt={auth.lastSyncedAt}
+                isSyncing={auth.isSyncing}
+                lang={lang}
+                onOpenAuthModal={auth.onOpenAuthModal}
+                onLogout={auth.onLogout}
+                onTriggerSync={auth.onTriggerSync}
+              />
+            )}
           </div>
         </header>
   );

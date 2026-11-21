@@ -3,6 +3,9 @@ import type { PortfolioData, ProjectItem, TimelineItem } from '@/lib/data';
 import type { CustomTechLink } from '@/lib/customTechLinks';
 import type { CVQRConfig } from '@/lib/cvQRCode';
 import type { CVTypographyConfig } from '@/lib/cvTypography';
+import type { CVTemplateProps } from '@/components/templates/types';
+
+export type { ProjectItem, TimelineItem, CVTemplateProps };
 
 export interface EducationItem {
   id: string;
@@ -155,3 +158,14 @@ export interface CVBuilderClientProps {
   initialPortfolio: PortfolioData;
   isPublicView?: boolean;
 }
+
+export type { PageFillStatus, A4PageMetrics, A4StatusStyle, AutoFitOptions } from './a4PageGauge';
+export type { PageMode, PageSheetMetric, PageBreakConfig, MultiPageInfo } from './cvPageLayout';
+export type { RichTextFormat, ToolbarPosition, RichTokenType, RichToken } from './cvRichText';
+export type { JobApplicationStatus, JobWorkType, JobApplication, KanbanColumnDef, JobTrackerStats } from './jobTracker';
+export type { AuthProvider, SyncStatus, AuthUser, CloudWorkspace, AuthSyncState } from './auth';
+export type { SupabaseConfig, UserCVCloudRecord, CloudSyncResult, SupabaseAuthState } from './supabase';
+
+
+
+

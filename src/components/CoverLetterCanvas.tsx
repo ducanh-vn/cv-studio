@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { CoverLetterData } from '@/lib/coverLetter';
-import { CVFontFamily, TemplateId } from '@/components/CVBuilderClient';
+import type { CVFontFamily, TemplateId } from '@/types/cvBuilder';
 import { Mail, Phone, MapPin, Globe, Calendar, Building, User, Briefcase } from 'lucide-react';
 
 export interface CoverLetterCanvasProps {

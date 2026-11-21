@@ -46,7 +46,7 @@ export function DeckerTemplate({
   removeCustomSection = () => {},
 }: CVTemplateProps) {
   return (
-    <div className="p-10 space-y-6">
+    <div className={isCompact ? 'p-6 space-y-4' : 'p-8 sm:p-10 space-y-5 sm:space-y-6'}>
       <div className="pb-4 border-b border-neutral-200 flex justify-between items-center">
         <div>
           <InlineEditable tag="h1" value={cv.name} onChange={(val) => setCv({ ...cv, name: val })} singleLine className="text-3xl font-bold uppercase tracking-tight text-neutral-900 block" />
