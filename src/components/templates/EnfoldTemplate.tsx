@@ -39,7 +39,7 @@ export function EnfoldTemplate({
   handleUpdateCustomLink,
 }: CVTemplateProps) {
   return (
-              <div className="min-h-[297mm] flex">
+              <div className="flex">
                 {/* Main Content Area */}
                 <div className="flex-1 p-8 space-y-6">
                   <div className="pb-4 border-b border-neutral-200">

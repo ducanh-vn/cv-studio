@@ -63,7 +63,7 @@ export function RabbitTemplate({
   removeCustomSection = () => {},
 }: CVTemplateProps) {
   return (
-    <div className="min-h-[297mm] flex flex-col">
+    <div className="flex flex-col">
       {/* Rabbit Dark Tech Header */}
       <div
         className={`${pad.header} text-white flex items-center justify-between border-b-4`}

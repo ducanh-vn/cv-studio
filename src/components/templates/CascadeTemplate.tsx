@@ -46,7 +46,7 @@ export function CascadeTemplate({
   removeCustomSection = () => {},
 }: CVTemplateProps) {
   return (
-    <div className="min-h-[297mm] flex">
+    <div className="flex">
       {/* Left Colored Sidebar (32% width) */}
       <div
         className="w-[32%] text-white p-7 space-y-6 flex-shrink-0"

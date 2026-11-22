@@ -6,6 +6,7 @@ import { getMultiPageInfo } from '@/lib/cvPageSplitter';
 
 export interface UseCVPageLayoutParams {
   paperRef: React.RefObject<HTMLDivElement>;
+  contentRef?: React.RefObject<HTMLDivElement>;
   scrollContainerRef?: React.RefObject<HTMLElement>;
   initialMode?: PageMode;
   lang?: 'vi' | 'en';
@@ -14,6 +15,7 @@ export interface UseCVPageLayoutParams {
 
 export function useCVPageLayout({
   paperRef,
+  contentRef,
   scrollContainerRef,
   initialMode = 'auto',
   lang = 'vi',
@@ -31,11 +33,13 @@ export function useCVPageLayout({
   const rafIdRef = useRef<number | null>(null);
 
   const updateMetrics = useCallback(() => {
-    if (!paperRef.current) return;
+    const targetEl = contentRef?.current || paperRef.current;
+    if (!targetEl) return;
 
-    const el = paperRef.current;
-    const width = el.clientWidth || 794;
-    const height = el.scrollHeight || 1123;
+    const paperEl = paperRef.current || targetEl;
+    const width = paperEl.clientWidth || targetEl.clientWidth || 794;
+    // offsetHeight provides the pure content height without overlay expansion
+    const height = targetEl.offsetHeight || targetEl.scrollHeight || 1123;
     const a4Height = Math.round(width * (297 / 210));
 
     const info = getMultiPageInfo(height, width, a4Height, pageMode, scrollPos);
@@ -50,7 +54,7 @@ export function useCVPageLayout({
       }
       return info;
     });
-  }, [paperRef, pageMode, scrollPos]);
+  }, [paperRef, contentRef, pageMode, scrollPos]);
 
   const scheduleUpdate = useCallback(() => {
     if (rafIdRef.current !== null) {
@@ -80,7 +84,7 @@ export function useCVPageLayout({
   useEffect(() => {
     scheduleUpdate();
 
-    const element = paperRef.current;
+    const element = contentRef?.current || paperRef.current;
     if (!element) return;
 
     let resizeObserver: ResizeObserver | null = null;
@@ -93,7 +97,7 @@ export function useCVPageLayout({
       if (resizeObserver) resizeObserver.disconnect();
       if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
     };
-  }, [paperRef, scheduleUpdate, pageMode, scrollPos, ...dependencies]);
+  }, [paperRef, contentRef, scheduleUpdate, pageMode, scrollPos, ...dependencies]);
 
   // Jump to specific page sheet
   const scrollToPage = useCallback(

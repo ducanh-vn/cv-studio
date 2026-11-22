@@ -92,9 +92,11 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
 }) => {
   const internalPaperRef = React.useRef<HTMLDivElement>(null);
   const targetPaperRef = paperRef || internalPaperRef;
+  const contentRef = React.useRef<HTMLDivElement>(null);
 
   const { metrics, autoFitToSinglePage } = useA4PageGauge({
     paperRef: targetPaperRef,
+    contentRef,
     lang,
     typographyConfig,
     setTypographyConfig,
@@ -111,6 +113,7 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
     scrollToPage,
   } = useCVPageLayout({
     paperRef: targetPaperRef,
+    contentRef,
     lang,
     dependencies: [cv, template, isCompact, typographyConfig, lang],
   });
@@ -268,6 +271,7 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
               } ${isPublicView ? 'cv-public-view' : ''} overflow-hidden animate-in fade-in duration-300`}
               style={{
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+                minHeight: multiPageInfo.totalPages > 1 ? `${multiPageInfo.totalPages * 297}mm` : '297mm',
                 ['--cv-body-size' as any]: `${typographyConfig.bodyFontSize}px`,
                 ['--cv-heading-size' as any]: `${typographyConfig.headingFontSize}px`,
                 ['--cv-line-height' as any]: `${typographyConfig.lineHeight}`,
@@ -315,22 +319,25 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
                 </div>
               )}
 
-              {/* Dynamic Template Switcher (10 Architectural Templates) */}
-              <CVTemplateSwitch {...commonTemplateProps} templateId={template} />
+              {/* Actual CV Content Wrapper (Measured accurately without overlay inflation) */}
+              <div ref={contentRef} id="cv-content-root" className="w-full">
+                {/* Dynamic Template Switcher (10 Architectural Templates) */}
+                <CVTemplateSwitch {...commonTemplateProps} templateId={template} />
 
-              {/* Dynamic Personal QR Code Footer Strip */}
-              {activeQrConfig.enabled && activeQrConfig.position === 'footer' && (
-                <div className="px-8 pb-4 pt-2">
-                  <CVQRCodeFooter
-                    qrDataUrl={qrDataUrl}
-                    config={activeQrConfig}
-                    lang={lang}
-                    accentColorHex={activeColor.primary}
-                    candidateName={cv.name}
-                    websiteUrl={getQRTargetText(activeQrConfig, cv)}
-                  />
-                </div>
-              )}
+                {/* Dynamic Personal QR Code Footer Strip */}
+                {activeQrConfig.enabled && activeQrConfig.position === 'footer' && (
+                  <div className="px-8 pb-4 pt-2">
+                    <CVQRCodeFooter
+                      qrDataUrl={qrDataUrl}
+                      config={activeQrConfig}
+                      lang={lang}
+                      accentColorHex={activeColor.primary}
+                      candidateName={cv.name}
+                      websiteUrl={getQRTargetText(activeQrConfig, cv)}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </CVReadOnlyContext.Provider>

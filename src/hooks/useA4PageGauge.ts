@@ -7,6 +7,7 @@ import type { CVTypographyConfig } from '@/lib/cvTypography';
 
 export interface UseA4PageGaugeParams {
   paperRef: React.RefObject<HTMLDivElement>;
+  contentRef?: React.RefObject<HTMLDivElement>;
   lang?: 'vi' | 'en';
   typographyConfig?: CVTypographyConfig;
   setTypographyConfig?: (config: CVTypographyConfig | ((prev: CVTypographyConfig) => CVTypographyConfig)) => void;
@@ -16,6 +17,7 @@ export interface UseA4PageGaugeParams {
 
 export function useA4PageGauge({
   paperRef,
+  contentRef,
   lang = 'vi',
   typographyConfig,
   setTypographyConfig,
@@ -29,13 +31,14 @@ export function useA4PageGauge({
   const rafIdRef = useRef<number | null>(null);
 
   const measure = useCallback(() => {
-    if (!paperRef.current) return;
+    const targetEl = contentRef?.current || paperRef.current;
+    if (!targetEl) return;
 
-    const el = paperRef.current;
-    // clientWidth provides the width excluding scrollbars
-    const width = el.clientWidth;
-    // scrollHeight provides the full height of the element's content
-    const height = el.scrollHeight;
+    const paperEl = paperRef.current || targetEl;
+    // clientWidth provides the width of the A4 paper
+    const width = paperEl.clientWidth || targetEl.clientWidth;
+    // offsetHeight provides the pure rendered height of CV content, free from absolute overlays
+    const height = targetEl.offsetHeight || targetEl.scrollHeight;
 
     if (width > 0 && height > 0) {
       const newMetrics = calculateA4Metrics(height, width, lang);
@@ -51,7 +54,7 @@ export function useA4PageGauge({
         return newMetrics;
       });
     }
-  }, [paperRef, lang]);
+  }, [paperRef, contentRef, lang]);
 
   const scheduleMeasure = useCallback(() => {
     if (rafIdRef.current !== null) {
@@ -73,7 +76,7 @@ export function useA4PageGauge({
 
     window.addEventListener('resize', scheduleMeasure);
 
-    const element = paperRef.current;
+    const element = contentRef?.current || paperRef.current;
     if (!element) {
       return () => {
         clearTimeout(t1);
@@ -116,7 +119,7 @@ export function useA4PageGauge({
         cancelAnimationFrame(rafIdRef.current);
       }
     };
-  }, [paperRef, scheduleMeasure, ...dependencies]);
+  }, [paperRef, contentRef, scheduleMeasure, ...dependencies]);
 
   // Auto-fit function to adjust typography and spacing so content fits 1 A4 page
   const autoFitToSinglePage = useCallback(() => {
