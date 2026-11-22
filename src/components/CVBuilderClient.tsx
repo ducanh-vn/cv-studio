@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { CheckCircle2, ChevronLeft, Save, Loader2 } from 'lucide-react';
+import { CheckCircle2, ChevronLeft, Save, Loader2, X } from 'lucide-react';
 import type { PortfolioData } from '@/lib/data';
 import type { TechBulletPoint } from '@/lib/techBulletPoints';
 import { useCVBuilder } from '@/hooks/useCVBuilder';
@@ -692,9 +692,12 @@ export default function CVBuilderClient({
 
         {/* ================= B. TOOL DRAWER (320px) ================= */}
         {!builder.isPreviewMode && !isPublicView && builder.isDrawerOpen && (
-          <aside className="no-print w-[320px] min-w-[320px] max-w-[85vw] bg-[#161B26] border-r border-white/10 flex flex-col z-40 lg:z-20 flex-shrink-0 transition-all duration-200 ease-in-out absolute lg:relative inset-y-0 left-[70px] lg:left-0 shadow-2xl lg:shadow-none">
+          <aside className="no-print fixed inset-x-0 bottom-14 top-14 md:static md:top-auto md:bottom-auto md:inset-x-auto md:w-[320px] md:min-w-[320px] md:max-w-none bg-[#161B26] border-t md:border-t-0 md:border-r border-white/10 flex flex-col z-50 md:z-20 flex-shrink-0 transition-all duration-200 ease-in-out shadow-2xl md:shadow-none rounded-t-2xl md:rounded-none animate-in slide-in-from-bottom md:slide-in-from-left">
+            {/* Mobile Pull Indicator */}
+            <div className="w-10 h-1 bg-white/20 rounded-full mx-auto my-2 md:hidden shrink-0" />
+
             {/* Drawer Header */}
-            <div className="h-12 min-h-[48px] px-4 border-b border-white/10 flex items-center justify-between bg-[#111827]/60">
+            <div className="h-12 min-h-[48px] px-4 border-b border-white/10 flex items-center justify-between bg-[#111827]/60 shrink-0">
               <div className="flex items-center space-x-2">
                 <span className="font-semibold text-white text-xs tracking-wide">
                   {builder.activeRailTab === 'design' && builder.t.drawerDesignTitle}
@@ -707,10 +710,12 @@ export default function CVBuilderClient({
               </div>
               <button
                 onClick={() => builder.setIsDrawerOpen(false)}
-                className="p-1 text-neutral-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-                title="Thu gọn"
+                className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer flex items-center space-x-1"
+                title={builder.lang === 'en' ? 'Close Drawer' : 'Thu gọn bảng công cụ'}
               >
-                <ChevronLeft className="w-4 h-4" />
+                <span className="text-[11px] md:hidden font-medium text-neutral-300">{builder.lang === 'en' ? 'Close' : 'Đóng'}</span>
+                <X className="w-4 h-4 md:hidden" />
+                <ChevronLeft className="w-4 h-4 hidden md:block" />
               </button>
             </div>
 
@@ -906,7 +911,7 @@ export default function CVBuilderClient({
         {!builder.isPreviewMode && builder.isDrawerOpen && (
           <div
             onClick={() => builder.setIsDrawerOpen(false)}
-            className="no-print lg:hidden fixed inset-0 bg-black/60 z-35 backdrop-blur-xs"
+            className="no-print md:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-xs animate-in fade-in duration-200"
           />
         )}
 

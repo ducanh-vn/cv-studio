@@ -316,6 +316,28 @@ export function useCVBuilder({
   const [canvasBgTheme, setCanvasBgTheme] = useState<CanvasBgThemeId>('figma-dots');
   const [isBgPickerOpen, setIsBgPickerOpen] = useState(false);
 
+  // Auto-fit zoom on mobile screens (< 768px) and auto-close drawer on initial mobile load
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 768) {
+        setIsDrawerOpen(false);
+        const padding = 24;
+        const availableWidth = Math.max(280, window.innerWidth - padding);
+        const autoFitZoom = Math.max(35, Math.min(80, Math.floor((availableWidth / 794) * 100)));
+        setZoom(autoFitZoom);
+      }
+    }
+  }, []);
+
+  const handleAutoFitScreen = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const isMobile = window.innerWidth < 768;
+    const padding = isMobile ? 24 : 80;
+    const availableWidth = Math.max(280, window.innerWidth - padding);
+    const fitZoom = Math.max(35, Math.min(isMobile ? 80 : 120, Math.floor((availableWidth / 794) * 100)));
+    setZoom(fitZoom);
+  }, []);
+
   const handleSelectCanvasBgTheme = useCallback((themeId: CanvasBgThemeId) => {
     setCanvasBgTheme(themeId);
     setIsBgPickerOpen(false);
@@ -1750,6 +1772,7 @@ export function useCVBuilder({
     // Canvas
     zoom,
     setZoom,
+    handleAutoFitScreen,
     canvasBgTheme,
     setCanvasBgTheme,
     handleSelectCanvasBgTheme,

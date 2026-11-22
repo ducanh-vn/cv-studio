@@ -69,10 +69,10 @@ export const CanvasFloatingControls: React.FC<CanvasFloatingControlsProps> = ({
     <>
       {/* Floating Zoom & Canvas Background Control Pill - Fixed at Bottom Right of Editor Canvas */}
       {!isPreviewMode && !isPublicView && (
-        <div className="no-print absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 flex items-center bg-[#161B26]/95 border border-white/10 rounded-full p-1 text-xs shadow-2xl backdrop-blur-md select-none transition-all hover:bg-[#161B26] hover:border-white/20">
+        <div className="no-print fixed bottom-16 right-3 md:absolute md:bottom-6 md:right-6 z-30 flex items-center bg-[#161B26]/95 border border-white/10 rounded-full p-1 text-xs shadow-2xl backdrop-blur-md select-none transition-all hover:bg-[#161B26] hover:border-white/20">
           <button
             type="button"
-            onClick={() => setZoom(Math.max(50, zoom - 10))}
+            onClick={() => setZoom(Math.max(30, zoom - 10))}
             className="p-1.5 text-neutral-400 hover:text-white rounded-full hover:bg-white/10 transition-colors cursor-pointer"
             title={lang === 'en' ? 'Zoom Out (-10%)' : 'Thu nhỏ (-10%)'}
           >
@@ -80,9 +80,22 @@ export const CanvasFloatingControls: React.FC<CanvasFloatingControlsProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => setZoom(100)}
-            className="px-2.5 py-0.5 font-mono text-[11px] text-neutral-200 hover:text-white font-medium select-none cursor-pointer hover:bg-white/5 rounded-full transition-colors"
-            title={lang === 'en' ? 'Click to reset to 100%' : 'Nhấp để reset về 100%'}
+            onClick={() => {
+              if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                if (zoom <= 55) {
+                  setZoom(90);
+                } else {
+                  const padding = 24;
+                  const availableWidth = Math.max(280, window.innerWidth - padding);
+                  const fitZoom = Math.max(35, Math.min(80, Math.floor((availableWidth / 794) * 100)));
+                  setZoom(fitZoom);
+                }
+              } else {
+                setZoom(zoom === 100 ? 90 : 100);
+              }
+            }}
+            className="px-2 py-0.5 font-mono text-[11px] text-neutral-200 hover:text-white font-medium select-none cursor-pointer hover:bg-white/5 rounded-full transition-colors"
+            title={lang === 'en' ? 'Click to toggle zoom' : 'Nhấp để chuyển đổi mức zoom'}
           >
             {zoom}%
           </button>

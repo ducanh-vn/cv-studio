@@ -138,22 +138,22 @@ export function EditorTopbar({
   if (isPreviewMode || isPublicView) return null;
 
   return (
-        <header className="no-print h-14 min-h-[56px] max-h-[56px] bg-[#111827] border-b border-white/10 px-3 sm:px-5 flex items-center justify-between relative z-50 select-none flex-shrink-0">
+        <header className="no-print h-14 min-h-[56px] max-h-[56px] bg-[#111827] border-b border-white/10 px-2 sm:px-5 flex items-center justify-between relative z-50 select-none flex-shrink-0 w-full max-w-full overflow-hidden">
           {/* Cụm Trái: Quay lại, Tên CV, Badge Đã lưu */}
-          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
+          <div className="flex items-center space-x-1.5 sm:space-x-3 min-w-0 flex-shrink">
             <a
               href={cv.website || "https://ducanh.dev"}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-neutral-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors flex-shrink-0"
+              className="p-1.5 sm:p-2 text-neutral-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors flex-shrink-0"
               title={lang === 'en' ? 'Back to Portfolio (ducanh.dev)' : 'Quay lại Portfolio (ducanh.dev)'}
             >
               <ArrowLeft className="w-4 h-4" />
             </a>
 
-            <div className="h-4 w-px bg-white/10 flex-shrink-0" />
+            <div className="h-4 w-px bg-white/10 flex-shrink-0 hidden xs:block" />
 
-            <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
+            <div className="flex items-center space-x-1 sm:space-x-2 min-w-0">
               <span className="hidden sm:inline-block font-semibold text-xs sm:text-sm text-white max-w-[160px] truncate" title={cv.name || 'Untitled CV'}>
                 {cv.name || 'Untitled CV'}
               </span>
@@ -164,18 +164,18 @@ export function EditorTopbar({
                 <button
                   type="button"
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                  className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-[#161B26] hover:bg-white/10 border border-white/10 text-white text-xs font-medium transition-all cursor-pointer group shadow-xs select-none"
+                  className="flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-2.5 py-1 rounded-lg bg-[#161B26] hover:bg-white/10 border border-white/10 text-white text-xs font-medium transition-all cursor-pointer group shadow-xs select-none max-w-[130px] xs:max-w-[170px] sm:max-w-none"
                   title={lang === 'en' ? 'Switch or manage CV Profiles' : 'Nhấp để đổi hoặc quản lý các phiên bản CV'}
                 >
                   <Layers className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                  <span className="font-medium text-xs text-cyan-300 max-w-[125px] xs:max-w-[150px] sm:max-w-[150px] md:max-w-[180px] truncate">
+                  <span className="font-medium text-xs text-cyan-300 max-w-[80px] xs:max-w-[110px] sm:max-w-[150px] md:max-w-[180px] truncate">
                     {activeProfile?.name || 'Hồ sơ CV'}
                   </span>
-                  <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-cyan-500/10 text-cyan-400 font-mono hidden lg:inline-block">
+                  <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-cyan-500/10 text-cyan-400 font-mono hidden md:inline-block">
                     {profiles.length} bản
                   </span>
                   <ChevronDown
-                    className={`w-3 h-3 text-neutral-400 group-hover:text-white transition-transform ${
+                    className={`w-3 h-3 text-neutral-400 group-hover:text-white transition-transform shrink-0 ${
                       isProfileMenuOpen ? 'rotate-180 text-white' : ''
                     }`}
                   />
@@ -398,14 +398,14 @@ export function EditorTopbar({
           </div>
 
           {/* Cụm Phải: Undo / Redo, Xem trước, Chia sẻ (icon-only), Nút chính Xuất PDF */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2 flex-shrink-0">
+          <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
             {/* Undo / Redo Controls */}
             <div className="flex items-center bg-[#161B26] border border-white/10 rounded-lg p-0.5 text-xs shadow-xs">
               <button
                 type="button"
                 onClick={handleUndo}
                 disabled={undoHistoryIndex <= 0}
-                className={`p-1.5 rounded-md transition-all flex items-center justify-center ${
+                className={`p-1 sm:p-1.5 rounded-md transition-all flex items-center justify-center ${
                   undoHistoryIndex > 0
                     ? 'text-neutral-200 hover:text-white hover:bg-white/10 active:scale-90 cursor-pointer shadow-xs'
                     : 'text-neutral-500/60 cursor-not-allowed opacity-50'
@@ -424,7 +424,7 @@ export function EditorTopbar({
                 type="button"
                 onClick={handleRedo}
                 disabled={undoHistoryIndex >= undoHistory.length - 1}
-                className={`p-1.5 rounded-md transition-all flex items-center justify-center ${
+                className={`p-1 sm:p-1.5 rounded-md transition-all flex items-center justify-center ${
                   undoHistoryIndex < undoHistory.length - 1
                     ? 'text-neutral-200 hover:text-white hover:bg-white/10 active:scale-90 cursor-pointer shadow-xs'
                     : 'text-neutral-500/60 cursor-not-allowed opacity-50'
@@ -444,23 +444,24 @@ export function EditorTopbar({
             <button
               type="button"
               onClick={() => setIsPreviewMode(true)}
-              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-white/10 bg-[#161B26] hover:bg-white/5 text-neutral-300 hover:text-white text-xs font-medium transition-colors cursor-pointer"
+              className="flex items-center space-x-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-lg border border-white/10 bg-[#161B26] hover:bg-white/5 text-neutral-300 hover:text-white text-xs font-medium transition-colors cursor-pointer"
               title={lang === 'en' ? 'Preview Fullscreen (ESC to exit)' : 'Xem trước toàn màn hình (bấm ESC để thoát)'}
+              aria-label={lang === 'en' ? 'Preview' : 'Xem trước'}
             >
               <Eye className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden sm:inline">{lang === 'en' ? 'Preview' : 'Xem trước'}</span>
+              <span className="hidden md:inline">{lang === 'en' ? 'Preview' : 'Xem trước'}</span>
             </button>
 
             {/* Nút Chia sẻ */}
             <button
               type="button"
               onClick={() => setIsShareModalOpen(true)}
-              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 hover:text-white transition-all cursor-pointer shadow-xs select-none"
+              className="flex items-center space-x-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 hover:text-white transition-all cursor-pointer shadow-xs select-none"
               title={lang === 'en' ? 'Share Public Link' : 'Chia sẻ CV trực tuyến'}
               aria-label={lang === 'en' ? 'Share CV' : 'Chia sẻ CV'}
             >
               <Share2 className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden sm:inline text-xs font-medium">{lang === 'en' ? 'Share' : 'Chia sẻ'}</span>
+              <span className="hidden md:inline text-xs font-medium">{lang === 'en' ? 'Share' : 'Chia sẻ'}</span>
             </button>
 
             {/* Nút chính Xuất PDF (Màu nổi bật nhất) */}
@@ -469,18 +470,18 @@ export function EditorTopbar({
                 type="button"
                 onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
                 disabled={isExportingImage}
-                className="flex items-center space-x-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs tracking-wide transition-all shadow-md shadow-indigo-500/20 active:scale-95 cursor-pointer disabled:opacity-50"
+                className="flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs tracking-wide transition-all shadow-md shadow-indigo-500/20 active:scale-95 cursor-pointer disabled:opacity-50"
                 title={lang === 'en' ? 'Export CV (PDF, PNG, JPG)' : 'Xuất CV (PDF, PNG, JPG)'}
               >
                 {isExportingImage ? (
                   <>
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>{lang === 'en' ? 'Exporting...' : 'Đang xuất...'}</span>
+                    <span className="hidden sm:inline">{lang === 'en' ? 'Exporting...' : 'Đang xuất...'}</span>
                   </>
                 ) : (
                   <>
                     <Download className="w-3.5 h-3.5" />
-                    <span className="hidden xs:inline">{lang === 'en' ? 'Export PDF' : 'Xuất PDF'}</span>
+                    <span className="hidden sm:inline">{lang === 'en' ? 'Export' : 'Xuất'}</span>
                     <ChevronDown className="w-3 h-3 ml-0.5 opacity-80" />
                   </>
                 )}

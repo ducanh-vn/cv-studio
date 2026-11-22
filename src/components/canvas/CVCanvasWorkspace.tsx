@@ -119,7 +119,7 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
   });
   return (
     <main
-      className="flex-1 h-full overflow-y-auto relative flex flex-col items-center py-8 sm:py-12 px-4 sm:px-10 pb-32 no-scrollbar transition-all"
+      className="flex-1 h-full overflow-y-auto relative flex flex-col items-center py-4 sm:py-12 px-2 sm:px-10 pb-24 md:pb-32 no-scrollbar transition-all overflow-x-hidden md:overflow-x-auto w-full max-w-full"
       style={currentCanvasBg.style}
     >
       {/* Minimal Floating Status Pill */}
