@@ -154,10 +154,10 @@ export function EditorTopbar({
             <div className="h-4 w-px bg-white/10 flex-shrink-0" />
 
             <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
-              <span className="font-semibold text-xs sm:text-sm text-white max-w-[110px] sm:max-w-[160px] truncate" title={cv.name || 'Untitled CV'}>
+              <span className="hidden sm:inline-block font-semibold text-xs sm:text-sm text-white max-w-[160px] truncate" title={cv.name || 'Untitled CV'}>
                 {cv.name || 'Untitled CV'}
               </span>
-              <span className="text-neutral-500 text-xs flex-shrink-0">/</span>
+              <span className="hidden sm:inline-block text-neutral-500 text-xs flex-shrink-0">/</span>
 
               {/* CV Profile Switcher Dropdown */}
               <div className="relative" ref={profileMenuRef}>
@@ -168,7 +168,7 @@ export function EditorTopbar({
                   title={lang === 'en' ? 'Switch or manage CV Profiles' : 'Nhấp để đổi hoặc quản lý các phiên bản CV'}
                 >
                   <Layers className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                  <span className="font-medium text-xs text-cyan-300 max-w-[110px] sm:max-w-[150px] md:max-w-[180px] truncate">
+                  <span className="font-medium text-xs text-cyan-300 max-w-[125px] xs:max-w-[150px] sm:max-w-[150px] md:max-w-[180px] truncate">
                     {activeProfile?.name || 'Hồ sơ CV'}
                   </span>
                   <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-cyan-500/10 text-cyan-400 font-mono hidden lg:inline-block">
@@ -181,167 +181,202 @@ export function EditorTopbar({
                   />
                 </button>
 
-                {/* Profile Switcher Dropdown Menu */}
+                {/* Profile Switcher: Mobile Bottom Sheet + Desktop Dropdown */}
                 {isProfileMenuOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-80 bg-[#161B26] border border-white/10 rounded-xl shadow-2xl p-2.5 z-[60] text-xs backdrop-blur-xl animate-in fade-in zoom-in-95 select-none">
-                    <div className="px-2 py-1 mb-1.5 flex items-center justify-between border-b border-white/5 pb-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-                        {lang === 'en' ? 'CV PROFILES' : 'CÁC PHIÊN BẢN CV'} ({profiles.length})
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsProfileMenuOpen(false);
-                          setShowNewProfileModal(true);
-                        }}
-                        className="flex items-center space-x-1 text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 cursor-pointer"
-                      >
-                        <Plus className="w-3 h-3" />
-                        <span>{lang === 'en' ? 'New Profile' : 'Tạo mới'}</span>
-                      </button>
-                    </div>
+                  <>
+                    {/* Mobile Backdrop */}
+                    <div
+                      className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[90] sm:hidden animate-in fade-in duration-200"
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                        setEditingProfileId(null);
+                      }}
+                    />
 
-                    {/* Profiles List */}
-                    <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
-                      {profiles.map((p) => {
-                        const isActive = p.id === activeProfileId;
-                        const isEditing = editingProfileId === p.id;
+                    <div className="fixed inset-x-0 bottom-0 z-[100] max-h-[85vh] flex flex-col rounded-t-2xl border-t border-white/10 bg-[#161B26] p-4 pb-6 shadow-2xl animate-in slide-in-from-bottom duration-200 select-none sm:absolute sm:inset-auto sm:left-0 sm:top-full sm:mt-2 sm:w-80 sm:max-h-none sm:rounded-xl sm:border sm:border-white/10 sm:p-2.5 sm:pb-2.5 sm:z-[60] sm:backdrop-blur-xl sm:zoom-in-95">
+                      {/* Mobile Pull Indicator */}
+                      <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 sm:hidden shrink-0" />
 
-                        return (
-                          <div
-                            key={p.id}
-                            className={`p-2 rounded-lg border transition-all ${
-                              isActive
-                                ? 'bg-cyan-500/10 border-cyan-500/30 text-white'
-                                : 'bg-white/5 border-transparent hover:border-white/10 text-neutral-300 hover:text-white'
-                            }`}
+                      <div className="px-1 sm:px-2 py-1 mb-2 sm:mb-1.5 flex items-center justify-between border-b border-white/5 pb-2.5 sm:pb-2 shrink-0">
+                        <div className="flex items-center space-x-1.5">
+                          <Layers className="w-4 h-4 text-cyan-400 sm:hidden" />
+                          <span className="text-xs sm:text-[10px] font-bold uppercase tracking-wider text-neutral-300 sm:text-neutral-400">
+                            {lang === 'en' ? 'CV PROFILES' : 'CÁC PHIÊN BẢN CV'} ({profiles.length})
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              setShowNewProfileModal(true);
+                            }}
+                            className="flex items-center space-x-1 text-xs sm:text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 cursor-pointer px-2 sm:px-0 py-1 sm:py-0 rounded-lg sm:rounded-none bg-cyan-500/10 sm:bg-transparent"
                           >
-                            <div className="flex items-center justify-between gap-1">
-                              {isEditing ? (
-                                <div className="flex items-center space-x-1.5 flex-1 min-w-0">
-                                  <input
-                                    type="text"
-                                    value={editingProfileName}
-                                    onChange={(e) => setEditingProfileName(e.target.value)}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') handleRenameProfile(p.id, editingProfileName);
-                                      if (e.key === 'Escape') setEditingProfileId(null);
-                                    }}
-                                    autoFocus
-                                    className="w-full bg-black/60 border border-cyan-500/50 rounded px-2 py-0.5 text-xs text-white outline-none"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => handleRenameProfile(p.id, editingProfileName)}
-                                    className="p-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white cursor-pointer"
-                                    title="Lưu tên"
-                                  >
-                                    <Check className="w-3 h-3" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => setEditingProfileId(null)}
-                                    className="p-1 rounded bg-white/10 hover:bg-white/20 text-neutral-300 cursor-pointer"
-                                    title="Hủy"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                </div>
-                              ) : (
-                                <>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleSwitchProfile(p.id)}
-                                    className="flex-1 text-left min-w-0 cursor-pointer"
-                                  >
-                                    <div className="flex items-center space-x-1.5">
-                                      <span className="font-semibold text-xs truncate">{p.name}</span>
-                                      {isActive && (
-                                        <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 font-mono shrink-0">
-                                          Đang mở
-                                        </span>
-                                      )}
-                                    </div>
-                                    <div className="text-[10px] text-neutral-400 truncate mt-0.5">
-                                      {p.targetRole || 'Software Engineer'} • Mẫu: <span className="capitalize">{p.template}</span> • {p.activeLang === 'en' ? 'EN' : 'VI'}
-                                    </div>
-                                  </button>
+                            <Plus className="w-3.5 h-3.5 sm:w-3 sm:h-3" />
+                            <span>{lang === 'en' ? 'New Profile' : 'Tạo mới'}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              setEditingProfileId(null);
+                            }}
+                            className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 sm:hidden cursor-pointer"
+                            title={lang === 'en' ? 'Close' : 'Đóng'}
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
 
-                                  <div className="flex items-center space-x-0.5 shrink-0">
-                                    {/* Duplicate */}
+                      {/* Profiles List */}
+                      <div className="space-y-1.5 sm:space-y-1 max-h-[50vh] sm:max-h-64 overflow-y-auto pr-1 custom-scrollbar">
+                        {profiles.map((p) => {
+                          const isActive = p.id === activeProfileId;
+                          const isEditing = editingProfileId === p.id;
+
+                          return (
+                            <div
+                              key={p.id}
+                              className={`p-2 rounded-lg border transition-all ${
+                                isActive
+                                  ? 'bg-cyan-500/10 border-cyan-500/30 text-white'
+                                  : 'bg-white/5 border-transparent hover:border-white/10 text-neutral-300 hover:text-white'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-1">
+                                {isEditing ? (
+                                  <div className="flex items-center space-x-1.5 flex-1 min-w-0">
+                                    <input
+                                      type="text"
+                                      value={editingProfileName}
+                                      onChange={(e) => setEditingProfileName(e.target.value)}
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleRenameProfile(p.id, editingProfileName);
+                                        if (e.key === 'Escape') setEditingProfileId(null);
+                                      }}
+                                      autoFocus
+                                      className="w-full bg-black/60 border border-cyan-500/50 rounded px-2 py-0.5 text-xs text-white outline-none"
+                                    />
                                     <button
                                       type="button"
-                                      onClick={() => handleDuplicateProfile(p.id)}
-                                      className="p-1 rounded text-neutral-400 hover:text-cyan-300 hover:bg-white/10 transition-colors cursor-pointer"
-                                      title="Nhân bản phiên bản này"
+                                      onClick={() => handleRenameProfile(p.id, editingProfileName)}
+                                      className="p-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white cursor-pointer"
+                                      title="Lưu tên"
                                     >
-                                      <Copy className="w-3 h-3" />
+                                      <Check className="w-3 h-3" />
                                     </button>
-
-                                    {/* Rename */}
+                                    <button
+                                      type="button"
+                                      onClick={() => setEditingProfileId(null)}
+                                      className="p-1 rounded bg-white/10 hover:bg-white/20 text-neutral-300 cursor-pointer"
+                                      title="Hủy"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <>
                                     <button
                                       type="button"
                                       onClick={() => {
-                                        setEditingProfileId(p.id);
-                                        setEditingProfileName(p.name);
+                                        handleSwitchProfile(p.id);
+                                        if (typeof window !== 'undefined' && window.innerWidth < 640) {
+                                          setIsProfileMenuOpen(false);
+                                        }
                                       }}
-                                      className="p-1 rounded text-neutral-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                                      title="Đổi tên phiên bản"
+                                      className="flex-1 text-left min-w-0 cursor-pointer"
                                     >
-                                      <Pencil className="w-3 h-3" />
+                                      <div className="flex items-center space-x-1.5">
+                                        <span className="font-semibold text-xs truncate">{p.name}</span>
+                                        {isActive && (
+                                          <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 font-mono shrink-0">
+                                            Đang mở
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="text-[10px] text-neutral-400 truncate mt-0.5">
+                                        {p.targetRole || 'Software Engineer'} • Mẫu: <span className="capitalize">{p.template}</span> • {p.activeLang === 'en' ? 'EN' : 'VI'}
+                                      </div>
                                     </button>
 
-                                    {/* Delete */}
-                                    {profiles.length > 1 && (
+                                    <div className="flex items-center space-x-0.5 shrink-0">
+                                      {/* Duplicate */}
                                       <button
                                         type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleDeleteProfile(p.id);
-                                        }}
-                                        className="p-1 rounded text-neutral-400 hover:text-rose-400 hover:bg-white/10 transition-colors cursor-pointer"
-                                        title="Xóa phiên bản này"
+                                        onClick={() => handleDuplicateProfile(p.id)}
+                                        className="p-1 rounded text-neutral-400 hover:text-cyan-300 hover:bg-white/10 transition-colors cursor-pointer"
+                                        title="Nhân bản phiên bản này"
                                       >
-                                        <Trash2 className="w-3 h-3" />
+                                        <Copy className="w-3 h-3" />
                                       </button>
-                                    )}
-                                  </div>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
 
-                    {/* Create New Profile Button */}
-                    <div className="mt-2 pt-2 border-t border-white/5 space-y-1.5">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsProfileMenuOpen(false);
-                          setShowNewProfileModal(true);
-                        }}
-                        className="w-full py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-cyan-400 hover:text-cyan-300 font-medium flex items-center justify-center space-x-1.5 transition-colors cursor-pointer text-xs"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>{lang === 'en' ? 'Create New CV Profile' : 'Thêm phiên bản CV mới'}</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsProfileMenuOpen(false);
-                          setShowImportModal(true);
-                          setParsedResult?.(null);
-                          setParseError?.(null);
-                        }}
-                        className="w-full py-1.5 px-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 hover:text-emerald-200 font-medium flex items-center justify-center space-x-1.5 transition-colors cursor-pointer text-xs border border-emerald-500/20"
-                      >
-                        <FileUp className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>{lang === 'en' ? 'Extract CV from PDF / Word →' : 'Trích xuất CV từ PDF / Word →'}</span>
-                      </button>
+                                      {/* Rename */}
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setEditingProfileId(p.id);
+                                          setEditingProfileName(p.name);
+                                        }}
+                                        className="p-1 rounded text-neutral-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                                        title="Đổi tên phiên bản"
+                                      >
+                                        <Pencil className="w-3 h-3" />
+                                      </button>
+
+                                      {/* Delete */}
+                                      {profiles.length > 1 && (
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeleteProfile(p.id);
+                                          }}
+                                          className="p-1 rounded text-neutral-400 hover:text-rose-400 hover:bg-white/10 transition-colors cursor-pointer"
+                                          title="Xóa phiên bản này"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </button>
+                                      )}
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Create New Profile Button */}
+                      <div className="mt-3 sm:mt-2 pt-2.5 sm:pt-2 border-t border-white/5 space-y-2 sm:space-y-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            setShowNewProfileModal(true);
+                          }}
+                          className="w-full py-2 sm:py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-cyan-400 hover:text-cyan-300 font-medium flex items-center justify-center space-x-1.5 transition-colors cursor-pointer text-xs"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>{lang === 'en' ? 'Create New CV Profile' : 'Thêm phiên bản CV mới'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            setShowImportModal(true);
+                            setParsedResult?.(null);
+                            setParseError?.(null);
+                          }}
+                          className="w-full py-2 sm:py-1.5 px-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 hover:text-emerald-200 font-medium flex items-center justify-center space-x-1.5 transition-colors cursor-pointer text-xs border border-emerald-500/20"
+                        >
+                          <FileUp className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>{lang === 'en' ? 'Extract CV from PDF / Word →' : 'Trích xuất CV từ PDF / Word →'}</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
               </div>
 
