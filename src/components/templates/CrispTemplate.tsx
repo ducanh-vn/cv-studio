@@ -91,9 +91,9 @@ export function CrispTemplate({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <div className="grid grid-cols-12 gap-8">
                   {/* Left Column: Summary, Experience, Projects */}
-                  <div className="md:col-span-7 space-y-6">
+                  <div className="col-span-7 space-y-6">
                     {sectionOrder
                       .filter((id) => ['summary', 'experience', 'projects'].includes(id) || id.startsWith('custom_'))
                       .map((secKey) => {
@@ -185,7 +185,7 @@ export function CrispTemplate({
                   </div>
 
                   {/* Right Column: Skills, Education */}
-                  <div className="md:col-span-5 space-y-6">
+                  <div className="col-span-5 space-y-6">
                     {sectionOrder
                       .filter((id) => ['skills', 'education'].includes(id))
                       .map((secKey) => {

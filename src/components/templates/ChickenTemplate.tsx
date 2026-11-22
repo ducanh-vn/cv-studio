@@ -101,9 +101,9 @@ export function ChickenTemplate({
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <div className="grid grid-cols-12 gap-8">
           {/* Left: Experience & Projects */}
-          <div className="md:col-span-7 space-y-6">
+          <div className="col-span-7 space-y-6">
             {sectionOrder
               .filter((id) => ['experience', 'projects'].includes(id) || id.startsWith('custom_'))
               .map((secKey) => {
@@ -181,7 +181,7 @@ export function ChickenTemplate({
           </div>
 
           {/* Right: Skills & Education */}
-          <div className="md:col-span-5 space-y-6">
+          <div className="col-span-5 space-y-6">
             {sectionOrder
               .filter((id) => ['skills', 'education'].includes(id))
               .map((secKey) => {

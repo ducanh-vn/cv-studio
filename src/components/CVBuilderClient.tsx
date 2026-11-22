@@ -1351,9 +1351,25 @@ export default function CVBuilderClient({
             background-color: #ffffff !important;
           }
 
+          /* Ensure multi-column architectural grid preserves side-by-side layout during print */
+          .cv-paper .grid-cols-12 {
+            display: grid !important;
+            grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+          }
+          .cv-paper .col-span-7 {
+            grid-column: span 7 / span 7 !important;
+          }
+          .cv-paper .col-span-5 {
+            grid-column: span 5 / span 5 !important;
+          }
+          .cv-paper .col-span-8 {
+            grid-column: span 8 / span 8 !important;
+          }
+          .cv-paper .col-span-4 {
+            grid-column: span 4 / span 4 !important;
+          }
+
           .cv-compact {
-            max-height: 297mm !important;
-            overflow: hidden !important;
             page-break-after: avoid !important;
             break-after: avoid !important;
           }

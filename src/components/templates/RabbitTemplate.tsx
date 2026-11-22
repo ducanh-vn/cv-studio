@@ -131,9 +131,9 @@ export function RabbitTemplate({
       </div>
 
       {/* Rabbit Body (2 Columns with Connected Timeline) */}
-      <div className={`${pad.body} flex-1 grid grid-cols-1 md:grid-cols-12 ${pad.gridGap}`}>
+      <div className={`${pad.body} flex-1 grid grid-cols-12 ${pad.gridGap}`}>
         {/* Left Column (65% width): Summary, Work Experience Timeline & Projects */}
-        <div className={`md:col-span-7 ${pad.sectionGap}`}>
+        <div className={`col-span-7 ${pad.sectionGap}`}>
           {sectionOrder
             .filter((id) => ['summary', 'experience', 'projects'].includes(id) || id.startsWith('custom_'))
             .map((secKey) => {
@@ -313,7 +313,7 @@ export function RabbitTemplate({
         </div>
 
         {/* Right Column (35% width): Skills Stack, Education & Credentials */}
-        <div className={`md:col-span-5 ${pad.sectionGap}`}>
+        <div className={`col-span-5 ${pad.sectionGap}`}>
           {sectionOrder
             .filter((id) => ['skills', 'education'].includes(id))
             .map((secKey) => {
