@@ -41,12 +41,12 @@ export const A4PageGaugeBadge: React.FC<A4PageGaugeBadgeProps> = ({
   const progressWidth = Math.min(100, Math.max(5, metrics.fillPercentage));
 
   return (
-    <div className={`relative inline-block ${className}`} ref={popoverRef}>
+    <div className={`relative inline-flex items-center ${className}`} ref={popoverRef}>
       {/* Clickable Badge Pill */}
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full border transition-all text-xs font-mono font-medium cursor-pointer select-none ${style.bgColor} ${style.borderColor} ${style.textColor} hover:brightness-110 shadow-sm`}
+        className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full border transition-all text-xs font-mono font-medium cursor-pointer select-none leading-none ${style.bgColor} ${style.borderColor} ${style.textColor} hover:brightness-110 shadow-sm`}
         title={metrics.recommendations[0] || ''}
       >
         {metrics.isOverflow ? (

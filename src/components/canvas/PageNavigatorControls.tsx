@@ -49,8 +49,8 @@ export const PageNavigatorControls: React.FC<PageNavigatorControlsProps> = ({
   const label = formatPageLabel(currentPage, totalPages, lang);
 
   return (
-    <div className="relative inline-block no-print" ref={containerRef}>
-      <div className="flex items-center space-x-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 rounded-full px-2.5 py-0.5 text-xs font-mono font-medium shadow-xs">
+    <div className="relative inline-flex items-center no-print" ref={containerRef}>
+      <div className="flex items-center space-x-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 rounded-full px-2.5 py-1 text-xs font-mono font-medium shadow-xs leading-none">
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}

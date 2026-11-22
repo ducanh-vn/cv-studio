@@ -141,13 +141,15 @@ export function EditorTopbar({
         <header className="no-print h-14 min-h-[56px] max-h-[56px] bg-[#111827] border-b border-white/10 px-3 sm:px-5 flex items-center justify-between relative z-50 select-none flex-shrink-0">
           {/* Cụm Trái: Quay lại, Tên CV, Badge Đã lưu */}
           <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
-            <Link
-              href="/"
+            <a
+              href={cv.website || "https://ducanh.dev"}
+              target="_blank"
+              rel="noopener noreferrer"
               className="p-2 text-neutral-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors flex-shrink-0"
-              title={lang === 'en' ? 'Back to Portfolio' : 'Quay lại Portfolio'}
+              title={lang === 'en' ? 'Back to Portfolio (ducanh.dev)' : 'Quay lại Portfolio (ducanh.dev)'}
             >
               <ArrowLeft className="w-4 h-4" />
-            </Link>
+            </a>
 
             <div className="h-4 w-px bg-white/10 flex-shrink-0" />
 
@@ -414,15 +416,16 @@ export function EditorTopbar({
               <span className="hidden sm:inline">{lang === 'en' ? 'Preview' : 'Xem trước'}</span>
             </button>
 
-            {/* Nút Chia sẻ (chỉ hiện icon Share có tooltip) */}
+            {/* Nút Chia sẻ */}
             <button
               type="button"
               onClick={() => setIsShareModalOpen(true)}
-              className="flex items-center justify-center p-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 hover:text-white transition-all cursor-pointer shadow-xs"
+              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 hover:text-white transition-all cursor-pointer shadow-xs select-none"
               title={lang === 'en' ? 'Share Public Link' : 'Chia sẻ CV trực tuyến'}
-              aria-label={lang === 'en' ? 'Share CV Link' : 'Chia sẻ CV'}
+              aria-label={lang === 'en' ? 'Share CV' : 'Chia sẻ CV'}
             >
               <Share2 className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden sm:inline text-xs font-medium">{lang === 'en' ? 'Share' : 'Chia sẻ'}</span>
             </button>
 
             {/* Nút chính Xuất PDF (Màu nổi bật nhất) */}
