@@ -47,9 +47,9 @@ export function SidebarRail({
   if (isPreviewMode || isPublicView) return null;
 
   return (
-    <nav className="no-print fixed bottom-0 inset-x-0 h-14 md:h-full md:static md:w-[70px] md:min-w-[70px] md:max-w-[70px] bg-[#111827]/95 md:bg-[#111827] backdrop-blur-md md:backdrop-blur-none border-t md:border-t-0 md:border-r border-white/10 flex flex-row md:flex-col items-center py-0 md:py-3 z-40 md:z-30 select-none flex-shrink-0 justify-between">
-      {/* Navigation Tabs (Horizontal on mobile, vertical on desktop) */}
-      <div className="w-full h-full flex flex-row md:flex-col items-center justify-around md:justify-start md:space-y-1">
+    <nav className="no-print fixed bottom-0 inset-x-0 h-14 md:h-full md:static md:w-[70px] md:min-w-[70px] md:max-w-[70px] bg-[#111827]/98 md:bg-[#111827] backdrop-blur-md md:backdrop-blur-none border-t md:border-t-0 md:border-r border-white/10 flex flex-row md:flex-col items-center py-0 md:py-3 z-40 md:z-30 select-none flex-shrink-0 justify-between w-full max-w-full overflow-hidden">
+      {/* Navigation Tabs (Horizontal 7 items on mobile, vertical on desktop) */}
+      <div className="w-full h-full flex flex-row md:flex-col items-center justify-between md:justify-start md:space-y-1">
         {[
           {
             id: 'design' as const,
@@ -74,17 +74,28 @@ export function SidebarRail({
             label: t.railAiAts,
             icon: <Sparkles className="w-4 h-4 md:w-5 md:h-5 mb-0.5 md:mb-1 text-amber-400" />,
             badge: (
-              <span
-                className={`absolute -top-1 -right-1 md:-right-2 text-[8px] md:text-[9px] font-bold font-mono px-1 py-0.2 rounded-full border leading-none shadow-xs ${
-                  cvStrength.score >= 80
-                    ? 'bg-emerald-500 text-white border-emerald-400'
-                    : cvStrength.score >= 60
-                    ? 'bg-amber-500 text-black border-amber-400'
-                    : 'bg-rose-500 text-white border-rose-400'
-                }`}
-              >
-                {cvStrength.score}%
-              </span>
+              <>
+                <span
+                  className={`hidden md:inline absolute -top-1 -right-2 text-[9px] font-bold font-mono px-1 py-0.2 rounded-full border leading-none shadow-xs ${
+                    cvStrength.score >= 80
+                      ? 'bg-emerald-500 text-white border-emerald-400'
+                      : cvStrength.score >= 60
+                      ? 'bg-amber-500 text-black border-amber-400'
+                      : 'bg-rose-500 text-white border-rose-400'
+                  }`}
+                >
+                  {cvStrength.score}%
+                </span>
+                <span
+                  className={`md:hidden absolute top-0.5 right-1 w-1.5 h-1.5 rounded-full ${
+                    cvStrength.score >= 80
+                      ? 'bg-emerald-400'
+                      : cvStrength.score >= 60
+                      ? 'bg-amber-400'
+                      : 'bg-rose-400'
+                  }`}
+                />
+              </>
             ),
           },
           {
@@ -95,12 +106,15 @@ export function SidebarRail({
           },
           {
             id: 'cover_letter' as const,
-            label: t.coverLetterNavTitle,
+            label: lang === 'en' ? 'Letter' : 'Thư CV',
             icon: <Mail className="w-4 h-4 md:w-5 md:h-5 mb-0.5 md:mb-1 text-purple-400" />,
             badge: (
-              <span className="absolute -top-1 -right-1 md:-right-2 text-[7px] md:text-[8px] font-bold font-mono px-1 py-0.2 rounded-full bg-purple-500/30 text-purple-200 border border-purple-400/40 leading-none shadow-xs">
-                SYNC
-              </span>
+              <>
+                <span className="hidden md:inline absolute -top-1 -right-2 text-[8px] font-bold font-mono px-1 py-0.2 rounded-full bg-purple-500/30 text-purple-200 border border-purple-400/40 leading-none shadow-xs">
+                  SYNC
+                </span>
+                <span className="md:hidden absolute top-0.5 right-1 w-1.5 h-1.5 rounded-full bg-purple-400" />
+              </>
             ),
           },
         ].map((tab) => {
@@ -124,7 +138,7 @@ export function SidebarRail({
                   setIsDrawerOpen(true);
                 }
               }}
-              className={`flex-1 md:flex-initial md:w-full h-full md:h-auto py-1 md:py-3 px-0.5 md:px-1 flex flex-col items-center justify-center relative transition-all cursor-pointer border-t-2 md:border-t-0 md:border-l-2 ${
+              className={`flex-1 min-w-0 w-0 md:w-full md:min-w-[70px] h-full md:h-auto py-1 md:py-3 px-0.5 md:px-1 flex flex-col items-center justify-center relative transition-all cursor-pointer border-t-2 md:border-t-0 md:border-l-2 ${
                 isActive
                   ? 'text-white bg-white/10 border-indigo-500'
                   : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5 border-transparent'
@@ -135,7 +149,7 @@ export function SidebarRail({
                 {tab.icon}
                 {tab.badge}
               </div>
-              <span className="text-[9px] md:text-[10px] font-medium tracking-tight text-center leading-tight mt-0.5 max-w-[48px] md:max-w-none truncate">
+              <span className="text-[9px] md:text-[10px] font-medium tracking-tight text-center leading-none mt-0.5 w-full truncate block px-0.5">
                 {tab.label}
               </span>
             </button>
@@ -147,17 +161,18 @@ export function SidebarRail({
           <button
             type="button"
             onClick={onOpenJobTracker}
-            className="flex-1 md:flex-initial md:w-full h-full md:h-auto py-1 md:py-3 px-0.5 md:px-1 flex flex-col items-center justify-center relative transition-all cursor-pointer text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 border-t-2 md:border-t-0 md:border-l-2 border-transparent hover:border-emerald-500 group"
+            className="flex-1 min-w-0 w-0 md:w-full md:min-w-[70px] h-full md:h-auto py-1 md:py-3 px-0.5 md:px-1 flex flex-col items-center justify-center relative transition-all cursor-pointer text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 border-t-2 md:border-t-0 md:border-l-2 border-transparent hover:border-emerald-500 group"
             title={lang === 'en' ? 'Job Application Kanban Tracker' : 'Bảng theo dõi ứng tuyển (Kanban)'}
           >
             <div className="relative flex items-center justify-center">
               <Kanban className="w-4 h-4 md:w-5 md:h-5 mb-0.5 md:mb-1 text-emerald-400 group-hover:scale-110 transition-transform" />
-              <span className="absolute -top-1 -right-1 md:-right-2 text-[7px] md:text-[8px] font-bold font-mono px-1 py-0.2 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 leading-none shadow-xs">
+              <span className="hidden md:inline absolute -top-1 -right-2 text-[8px] font-bold font-mono px-1 py-0.2 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 leading-none shadow-xs">
                 JOB
               </span>
+              <span className="md:hidden absolute top-0.5 right-1 w-1.5 h-1.5 rounded-full bg-emerald-400" />
             </div>
-            <span className="text-[9px] md:text-[10px] font-medium tracking-tight text-center leading-tight mt-0.5 text-neutral-300 group-hover:text-white max-w-[48px] md:max-w-none truncate">
-              {lang === 'en' ? 'Tracker' : 'Ứng tuyển'}
+            <span className="text-[9px] md:text-[10px] font-medium tracking-tight text-center leading-none mt-0.5 text-neutral-300 group-hover:text-white w-full truncate block px-0.5">
+              {lang === 'en' ? 'Jobs' : 'Ứng tuyển'}
             </span>
           </button>
         )}

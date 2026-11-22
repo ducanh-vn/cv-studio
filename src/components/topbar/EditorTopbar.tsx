@@ -381,7 +381,7 @@ export function EditorTopbar({
               </div>
 
               {/* Indicator trạng thái lưu dạng text nhỏ màu xám mờ ngay cạnh dropdown chọn phiên bản */}
-              <div className="flex items-center space-x-1 text-[11px] text-neutral-400/80 select-none pl-1 flex-shrink-0">
+              <div className="hidden md:flex items-center space-x-1 text-[11px] text-neutral-400/80 select-none pl-1 flex-shrink-0">
                 {isSaving ? (
                   <span className="flex items-center space-x-1 text-cyan-400">
                     <Loader2 className="w-3 h-3 animate-spin" />
@@ -444,7 +444,7 @@ export function EditorTopbar({
             <button
               type="button"
               onClick={() => setIsPreviewMode(true)}
-              className="flex items-center space-x-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-lg border border-white/10 bg-[#161B26] hover:bg-white/5 text-neutral-300 hover:text-white text-xs font-medium transition-colors cursor-pointer"
+              className="hidden xs:flex items-center space-x-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-lg border border-white/10 bg-[#161B26] hover:bg-white/5 text-neutral-300 hover:text-white text-xs font-medium transition-colors cursor-pointer"
               title={lang === 'en' ? 'Preview Fullscreen (ESC to exit)' : 'Xem trước toàn màn hình (bấm ESC để thoát)'}
               aria-label={lang === 'en' ? 'Preview' : 'Xem trước'}
             >

@@ -65,7 +65,7 @@ export function UserSyncMenu({
       <button
         type="button"
         onClick={onOpenAuthModal}
-        className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 hover:text-white text-xs font-medium transition-all cursor-pointer shadow-xs"
+        className="flex items-center space-x-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 hover:text-white text-xs font-medium transition-all cursor-pointer shadow-xs"
         title={t.guestBadge}
       >
         <Cloud className="w-3.5 h-3.5 text-cyan-400" />
@@ -84,7 +84,7 @@ export function UserSyncMenu({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-2.5 py-1.5 rounded-lg border border-white/10 bg-[#161B26] hover:bg-white/5 text-neutral-200 hover:text-white text-xs font-medium transition-colors cursor-pointer"
+        className="flex items-center space-x-1.5 p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-white/10 bg-[#161B26] hover:bg-white/5 text-neutral-200 hover:text-white text-xs font-medium transition-colors cursor-pointer"
         title={t.syncedBadge}
       >
         {/* Avatar */}
@@ -112,7 +112,7 @@ export function UserSyncMenu({
           <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
         )}
 
-        <ChevronDown className="w-3 h-3 text-neutral-400" />
+        <ChevronDown className="w-3 h-3 text-neutral-400 hidden sm:inline" />
       </button>
 
       {/* Dropdown Menu */}
