@@ -143,7 +143,7 @@ export const DesignTab: React.FC<DesignTabProps> = ({
                       <span className="uppercase text-[10px] tracking-wider font-semibold text-neutral-400">
                         {lang === 'en' ? 'CV TEMPLATE' : 'MẪU GIAO DIỆN'}
                       </span>
-                      <span className="text-[10px] text-cyan-400 font-medium">14 {lang === 'en' ? 'Templates' : 'Mẫu'}</span>
+                      <span className="text-[10px] text-cyan-400 font-medium">{TEMPLATES_COLLECTION.length} {lang === 'en' ? 'Templates' : 'Mẫu'}</span>
                     </div>
                     <div className="p-3 rounded-xl bg-[#111827] border border-white/10 flex items-center justify-between">
                       <div className="flex items-center space-x-2.5">
@@ -184,7 +184,7 @@ export const DesignTab: React.FC<DesignTabProps> = ({
                       onClick={() => setShowGalleryModal(true)}
                       className="w-full py-1.5 text-center text-[11px] text-indigo-400 hover:text-indigo-300 font-medium transition-colors cursor-pointer"
                     >
-                      {lang === 'en' ? 'Browse all 14 templates →' : 'Khám phá tất cả 14 mẫu giao diện →'}
+                      {lang === 'en' ? `Browse all ${TEMPLATES_COLLECTION.length} templates →` : `Khám phá tất cả ${TEMPLATES_COLLECTION.length} mẫu giao diện →`}
                     </button>
                   </div>
 
@@ -452,10 +452,10 @@ export const DesignTab: React.FC<DesignTabProps> = ({
                           </label>
                           <div className="grid grid-cols-2 gap-1.5 text-[10px]">
                             {[
-                              { id: 'website' as const, label: t.qrTargetWebsite, icon: '🌐' },
+                              { id: 'website' as const, label: t.qrTargetWebsite, icon: '🌐', full: true },
                               { id: 'linkedin' as const, label: t.qrTargetLinkedin, icon: '💼' },
                               { id: 'github' as const, label: t.qrTargetGithub, icon: '🐙' },
-                              { id: 'vcard' as const, label: t.qrTargetVcard, icon: '📇' },
+                              { id: 'vcard' as const, label: t.qrTargetVcard, icon: '📇', full: true },
                               { id: 'custom' as const, label: t.qrTargetCustom, icon: '🔗' },
                             ].map((target) => (
                               <button
@@ -470,14 +470,14 @@ export const DesignTab: React.FC<DesignTabProps> = ({
                                   });
                                 }}
                                 className={`px-2 py-1.5 rounded-lg border text-left transition-all cursor-pointer flex items-center space-x-1.5 ${
-                                  target.id === 'custom' ? 'col-span-2' : ''
+                                  target.full || target.id === 'custom' ? 'col-span-2' : 'col-span-1'
                                 } ${
                                   activeQrConfig.targetType === target.id
                                     ? 'bg-cyan-500/15 border-cyan-400 text-cyan-300 font-semibold shadow-xs'
                                     : 'bg-white/5 border-white/10 text-neutral-300 hover:bg-white/10'
                                 }`}
                               >
-                                <span>{target.icon}</span>
+                                <span className="shrink-0">{target.icon}</span>
                                 <span className="truncate">{target.label}</span>
                               </button>
                             ))}

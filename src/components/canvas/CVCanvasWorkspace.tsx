@@ -34,7 +34,9 @@ import { PageNavigatorControls } from '@/components/canvas/PageNavigatorControls
 export interface CVCanvasWorkspaceProps {
   currentCanvasBg: CanvasBgThemeOption;
   isPublicView: boolean;
+  isPreviewMode?: boolean;
   docMode: 'cv' | 'cover_letter';
+  setDocMode?: (mode: 'cv' | 'cover_letter') => void;
   lang: Language;
   t: any;
   activeTemplateDef: TemplateDef;
@@ -62,7 +64,9 @@ export interface CVCanvasWorkspaceProps {
 export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
   currentCanvasBg,
   isPublicView,
+  isPreviewMode = false,
   docMode,
+  setDocMode,
   lang,
   t,
   activeTemplateDef,
@@ -116,7 +120,8 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
       style={currentCanvasBg.style}
     >
       {/* Minimal Floating Status Pill */}
-      <div className="no-print relative z-10 mb-4 px-3 sm:px-4 py-1.5 rounded-full bg-[#161B26]/90 border border-white/10 backdrop-blur-md shadow-lg text-[11px] text-neutral-400 flex items-center space-x-1.5 sm:space-x-2 select-none flex-wrap justify-center flex-shrink-0 max-w-full">
+      {!isPreviewMode && (
+        <div className="no-print relative z-10 mb-4 px-3 sm:px-4 py-1.5 rounded-2xl sm:rounded-full bg-[#161B26]/90 border border-white/10 backdrop-blur-md shadow-lg text-[11px] text-neutral-400 flex items-center gap-1.5 sm:gap-2 select-none flex-wrap justify-center flex-shrink-0 max-w-full">
         {isPublicView ? (
           <>
             <span className="flex items-center space-x-1.5 text-emerald-400 font-semibold">
@@ -217,6 +222,21 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
           </>
         )}
       </div>
+      )}
+
+      {/* Cover Letter Mode Indicator & Quick Return Banner */}
+      {docMode === 'cover_letter' && !isPublicView && setDocMode && !isPreviewMode && (
+        <div className="no-print mb-4 flex items-center space-x-2 bg-purple-900/60 border border-purple-500/30 text-purple-200 px-4 py-1.5 rounded-full text-xs shadow-lg backdrop-blur-md">
+          <span>✉️ {lang === 'en' ? 'Matching Cover Letter' : 'Đang xem Thư xin việc'}</span>
+          <button
+            type="button"
+            onClick={() => setDocMode('cv')}
+            className="px-2.5 py-0.5 rounded-full bg-purple-500 hover:bg-purple-400 text-white font-medium text-[11px] transition-colors cursor-pointer ml-1"
+          >
+            {lang === 'en' ? '← Back to CV' : '← Quay lại chỉnh sửa CV'}
+          </button>
+        </div>
+      )}
 
       <div
         style={{
@@ -226,7 +246,7 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
         className="transition-transform duration-200"
       >
         {/* ================= THE A4 SHEET ================= */}
-        <CVReadOnlyContext.Provider value={isPublicView}>
+        <CVReadOnlyContext.Provider value={isPublicView || isPreviewMode}>
           {docMode === 'cover_letter' ? (
             <CoverLetterCanvas
               coverLetter={currentCoverLetter}
@@ -258,24 +278,26 @@ export const CVCanvasWorkspace: React.FC<CVCanvasWorkspaceProps> = ({
               }}
             >
               {/* If Single Page Mode or only 1 page: Show Single-page Cutoff Line & Overflow Overlay System */}
-              {pageMode === 'single' || !multiPageInfo.isMultiPage ? (
-                <A4PageOverflowOverlay
-                  metrics={metrics}
-                  lang={lang}
-                  onAutoFit={autoFitToSinglePage}
-                  isPublicView={isPublicView}
-                />
-              ) : (
-                /* Multi-Page Sheet Demarcation Separators */
-                Array.from({ length: multiPageInfo.totalPages - 1 }, (_, i) => i + 2).map((pageNum) => (
-                  <MultiPageSheetSeparator
-                    key={pageNum}
-                    pageNumber={pageNum}
+              {!isPreviewMode && !isPublicView && (
+                pageMode === 'single' || !multiPageInfo.isMultiPage ? (
+                  <A4PageOverflowOverlay
+                    metrics={metrics}
                     lang={lang}
-                    onScrollToPage={scrollToPage}
+                    onAutoFit={autoFitToSinglePage}
                     isPublicView={isPublicView}
                   />
-                ))
+                ) : (
+                  /* Multi-Page Sheet Demarcation Separators */
+                  Array.from({ length: multiPageInfo.totalPages - 1 }, (_, i) => i + 2).map((pageNum) => (
+                    <MultiPageSheetSeparator
+                      key={pageNum}
+                      pageNumber={pageNum}
+                      lang={lang}
+                      onScrollToPage={scrollToPage}
+                      isPublicView={isPublicView}
+                    />
+                  ))
+                )
               )}
 
               {/* Optional Subtle Page Number Indicators on Canvas sheets */}

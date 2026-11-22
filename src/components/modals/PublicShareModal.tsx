@@ -93,7 +93,7 @@ export function PublicShareModal({
             </div>
 
             {/* Modal Body */}
-            <div className="p-4 sm:p-6 overflow-y-auto space-y-5 text-xs text-neutral-300">
+            <div className="flex-1 min-h-0 p-4 sm:p-6 overflow-y-auto custom-scrollbar space-y-5 text-xs text-neutral-300">
               {/* Public Link Box */}
               <div className="p-4 rounded-xl bg-[#090C13] border border-white/10 space-y-3">
                 <div className="flex items-center justify-between">

@@ -97,7 +97,7 @@ export const cvTranslations = {
     techModalTitle: 'Kho Gợi Ý Mô Tả Chuẩn Công Nghệ (Google XYZ)',
     techModalSubtitle: 'Mẫu mô tả công việc & đóng góp kỹ thuật cao cấp theo công thức Action Verb + Tech + Impact (Google XYZ) giúp CV ghi điểm tuyệt đối với nhà tuyển dụng và hệ thống ATS.',
     techFormulaLabel: 'Công thức Google XYZ:',
-    techFormulaDesc: 'Accomplished [X] as measured by [Y], by doing [Z] (Đạt được [X], đo lường bằng [Y], thông qua việc thực hiện [Z]).',
+    techFormulaDesc: '(Đạt được [X], đo lường bằng [Y], thông qua việc thực hiện [Z]).',
     techSearchPlaceholder: 'Tìm theo công nghệ, từ khóa (VD: Next.js, Docker, API, Tối ưu)...',
     techTargetLabel: 'Đang chọn chèn vào:',
     techTargetCopyOnly: 'Chỉ sao chép / Không chèn',

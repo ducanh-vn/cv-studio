@@ -265,7 +265,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
                       ref={sectionTabsRef}
                       onScroll={checkSectionTabsScroll}
                       onWheel={handleSectionTabsWheel}
-                      className="flex text-xs overflow-x-auto custom-scrollbar-x px-3 pb-1.5 pt-0.5 scroll-smooth"
+                      className="flex text-xs overflow-x-auto custom-scrollbar-x px-8 pb-1.5 pt-0.5 scroll-smooth"
                     >
                       {[
                         { id: 'profile', label: t.profileTab, isHidden: false },

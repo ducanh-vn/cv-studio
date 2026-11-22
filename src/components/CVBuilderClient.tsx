@@ -914,7 +914,9 @@ export default function CVBuilderClient({
         <CVCanvasWorkspace
           currentCanvasBg={builder.activeCanvasBgTheme}
           isPublicView={isPublicView}
+          isPreviewMode={builder.isPreviewMode}
           docMode={builder.docMode}
+          setDocMode={builder.setDocMode}
           lang={builder.lang}
           t={builder.t}
           activeTemplateDef={builder.activeTemplateDef}

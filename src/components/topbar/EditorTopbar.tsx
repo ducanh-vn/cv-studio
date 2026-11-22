@@ -138,7 +138,7 @@ export function EditorTopbar({
   if (isPreviewMode || isPublicView) return null;
 
   return (
-        <header className="no-print h-14 min-h-[56px] max-h-[56px] bg-[#111827] border-b border-white/10 px-3 sm:px-5 flex items-center justify-between z-40 select-none flex-shrink-0">
+        <header className="no-print h-14 min-h-[56px] max-h-[56px] bg-[#111827] border-b border-white/10 px-3 sm:px-5 flex items-center justify-between relative z-50 select-none flex-shrink-0">
           {/* Cụm Trái: Quay lại, Tên CV, Badge Đã lưu */}
           <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
             <Link
@@ -181,7 +181,7 @@ export function EditorTopbar({
 
                 {/* Profile Switcher Dropdown Menu */}
                 {isProfileMenuOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-80 bg-[#161B26] border border-white/10 rounded-xl shadow-2xl p-2.5 z-50 text-xs backdrop-blur-xl animate-in fade-in zoom-in-95 select-none">
+                  <div className="absolute left-0 top-full mt-2 w-80 bg-[#161B26] border border-white/10 rounded-xl shadow-2xl p-2.5 z-[60] text-xs backdrop-blur-xl animate-in fade-in zoom-in-95 select-none">
                     <div className="px-2 py-1 mb-1.5 flex items-center justify-between border-b border-white/5 pb-2">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
                         {lang === 'en' ? 'CV PROFILES' : 'CÁC PHIÊN BẢN CV'} ({profiles.length})
@@ -419,8 +419,8 @@ export function EditorTopbar({
               type="button"
               onClick={() => setIsShareModalOpen(true)}
               className="flex items-center justify-center p-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 hover:text-white transition-all cursor-pointer shadow-xs"
-              title={t.shareModalTitle || (lang === 'en' ? 'Share Public Link' : 'Chia sẻ đường dẫn công khai')}
-              aria-label="Share CV Link"
+              title={lang === 'en' ? 'Share Public Link' : 'Chia sẻ CV trực tuyến'}
+              aria-label={lang === 'en' ? 'Share CV Link' : 'Chia sẻ CV'}
             >
               <Share2 className="w-3.5 h-3.5 text-cyan-400" />
             </button>
@@ -450,7 +450,7 @@ export function EditorTopbar({
 
               {/* Dropdown Menu */}
               {isExportMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-[#161B26] border border-white/10 rounded-xl shadow-2xl p-2.5 z-50 text-xs backdrop-blur-xl animate-in fade-in zoom-in-95 select-none">
+                <div className="absolute right-0 top-full mt-2 w-80 bg-[#161B26] border border-white/10 rounded-xl shadow-2xl p-2.5 z-[60] text-xs backdrop-blur-xl animate-in fade-in zoom-in-95 select-none">
                   <div className="px-2 py-1 mb-1.5 flex items-center justify-between border-b border-white/5 pb-2">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
                       {lang === 'en' ? 'EXPORT CV & DOCUMENTS' : 'ĐỊNH DẠNG XUẤT HỒ SƠ'}

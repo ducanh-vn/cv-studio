@@ -111,10 +111,15 @@ export function SidebarRail({
                     onClick={() => {
                       if (activeRailTab === tab.id) {
                         setIsDrawerOpen(!isDrawerOpen);
+                        if (tab.id !== 'cover_letter') {
+                          setDocMode?.('cv');
+                        }
                       } else {
                         setActiveRailTab(tab.id);
                         if (tab.id === 'cover_letter') {
                           setDocMode?.('cover_letter');
+                        } else {
+                          setDocMode?.('cv');
                         }
                         setIsDrawerOpen(true);
                       }
